@@ -6,7 +6,7 @@ Created on Wed Jun  3 14:34:33 2020
 """
 
 
-from Validation import OptimalTransportGridSearch,RasterOptimalTransport
+from POTTOK import OptimalTransportGridSearch,RasterOptimalTransport
 import museotoolbox as mtb
 import ot
 import museopheno as mp

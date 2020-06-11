@@ -80,7 +80,7 @@ class OptimalTransportGridSearch:
         """
         
         if self._is_grid_search() :         
-            self._find_best_parameters(self.Xs, ys=self.ys, Xt=self.Xt, yt=self.yt)    
+            self._find_best_parameters_circular(self.Xs, ys=self.ys, Xt=self.Xt, yt=self.yt)    
         else : 
             self.transport_model.fit(self.Xs, ys=self.ys, Xt=self.Xt, yt=self.yt) 
             
@@ -210,6 +210,9 @@ class OptimalTransportGridSearch:
     
     
     def _share_args(self,**params):
+        """
+        Allow to stock each parameters enter by the user
+        """
         for key,value in params.items():
             if key =='scaler':
                 if value is False:
@@ -221,6 +224,16 @@ class OptimalTransportGridSearch:
             
     
     def _prefit(self,Xs,Xt) : 
+        """
+        Scale Xs and Xt
+
+        Parameters
+        ----------
+        Xs : array_like, shape (n_source_samples, n_features)
+            Source domain array.
+        ys : array_like, shape (n_source_samples,)
+            Label source array (1d).
+        """
         
         if self.verbose:
             print('Learning Optimal Transport with ' +
@@ -238,8 +251,21 @@ class OptimalTransportGridSearch:
             print("Xs and Xt are not scaled")
         
         
-    def _to_scale(self,data,method) : 
-           
+    def _to_scale(self,data,method) :
+        """
+        Scale Xs and Xt
+
+        Parameters
+        ----------
+        Xs : array_like, shape (n_source_samples, n_features)
+            Source domain array.
+        ys : array_like, shape (n_source_samples,)
+            Label source array (1d).
+            
+        Return
+        ----------
+        scaler : fitted scaler on data
+        """          
         scaler = method()
         scaler.fit(data) #pour vérifier qu'il y a quelque chose dedans après le .fit : scaler.scaler_
         return scaler
@@ -319,7 +345,19 @@ class OptimalTransportGridSearch:
                          str(self.best_score))
         
 
-    def _find_best_parameters(self, Xs, ys, Xt, yt):
+    def _find_best_parameters_circular(self, Xs, ys, Xt, yt):
+        """
+        Parameters
+        ----------
+        Xs : array_like, shape (n_source_samples, n_features)
+            Source domain array.
+        ys : array_like, shape (n_source_samples,)
+            Label source array (1d).
+        Xt: array_like, shape (n_source_samples, n_features)
+            Target domain array.
+        yt: array_like, shape (n_source_samples,)
+            Label target array (1d). 
+        """  
         self.best_score = None
         for gridOT in self._generate_params_from_grid_search():
             transport_model_tmp = self.transport_function(**gridOT)
