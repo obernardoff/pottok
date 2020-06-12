@@ -51,44 +51,50 @@ Xt_ndvi = s2_ts.generate_index(Xs, s2_ts.get_index_expression('ACORVI'))  #calcu
 
 #crossed non scale
 
-
+print("Xs et Xt non scaled - crossed")
 test_crossed = OptimalTransportGridSearch(transport_function = ot.da.MappingTransport,
                               params=dict(mu=[2.0,0.1], eta=[10.0,2.0]))
 
 test_crossed.preprocessing(Xs,ys,Xt,yt,scaler = False)
-print(test_crossed.Xs)
-print(test_crossed.Xt)
+#print(test_crossed.Xs)
+#print(test_crossed.Xt)
 
 test_crossed.fit_crossed(group_t=group_t,classifier=RandomForestClassifier(random_state=42))
 Xs_transform_crossed = test_crossed.predict_transfer(Xs)
 test_crossed.improve(Xs_transform_crossed)
-
+print("----------------------------------")
+print("----------------------------------")
 
 #crossed scale
 
+print("Xs et Xt scaled - crossed")
 test_crossed_scale = OptimalTransportGridSearch(transport_function = ot.da.MappingTransport,
                               params=dict(mu=[2.0,0.1], eta=[10.0,2.0]))
 
 test_crossed_scale.preprocessing(Xs,ys,Xt,yt,scaler = StandardScaler)
-print(test_crossed_scale.Xs)
-print(test_crossed_scale.Xt)
+#print(test_crossed_scale.Xs)
+#print(test_crossed_scale.Xt)
 
 test_crossed_scale.fit_crossed(group_t=group_t,classifier=RandomForestClassifier(random_state=42))
 Xs_transform_crossed = test_crossed_scale.predict_transfer(Xs)
 test_crossed_scale.improve(Xs_transform_crossed)
-
+print("----------------------------------")
+print("----------------------------------")
 
 
 #circular
 
+print("Xs et Xt scaled - circular")
 test_circular = OptimalTransportGridSearch(transport_function = ot.da.MappingTransport,
                               params=dict(mu=[2.0,0.1], eta=[10.0,2.0]))
 test_circular.preprocessing(Xs,ys,Xt,yt,scaler = StandardScaler)
-print(test_circular.Xs)
-print(test_circular.Xt)
+#print(test_circular.Xs)
+#print(test_circular.Xt)
 
 
 test_circular.fit_circular()
+print("----------------------------------")
+print("----------------------------------")
 
 
 
@@ -96,22 +102,25 @@ test_circular.fit_circular()
 #Xs et Xt NDVI
 ###################
 
-
+print("Xs et Xt scaled NDVI - crossed")
 test_ndvi = OptimalTransportGridSearch(transport_function = ot.da.MappingTransport,
                               params=dict(mu=[2.0,0.1], eta=[10.0,2.0]))
 test_ndvi.preprocessing(Xs,ys,Xt,yt,scaler = StandardScaler)
-print(test_ndvi.Xs)
-print(test_ndvi.Xt)
+#print(test_ndvi.Xs)
+#print(test_ndvi.Xt)
 
 test_ndvi.fit_crossed(group_t=group_t,classifier=RandomForestClassifier(random_state=42))
 Xs_transform_crossed = test_ndvi.predict_transfer(Xs)
 test_ndvi.improve(Xs_transform_crossed)
+print("----------------------------------")
+print("----------------------------------")
 
 
 ###################
 #avec toute l'image 
 ###################
 
+print("Xs et Xt scaled on all image - crossed")
 test_raster = RasterOptimalTransport(transport_function = ot.da.MappingTransport,
                               params=dict(mu=[2.0,0.1], eta=[10.0,2.0]))
 

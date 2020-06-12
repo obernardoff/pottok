@@ -23,7 +23,7 @@ class OptimalTransportGridSearch:
     ----------
     transport_function: class  of ot.da, optional (default=ot.da.MappingTransport)
         from ot.da. e.g ot
-    params : dict
+    params_ot : dict
         parameters of the optimal transport funtion.
     verbose : boolean, optional (default=True)
         gives informations about the object
@@ -168,7 +168,7 @@ class OptimalTransportGridSearch:
         return data
     
 
-    def improve(self,Xs_transform, method = "valid"):
+    def improve(self,Xs_transform, method = "test"):
         """
         OA comparison before and after OT
 
@@ -303,6 +303,8 @@ class OptimalTransportGridSearch:
 
     def _find_best_parameters_crossed(self,Xs,ys,Xt,yt,group_val):
         """
+        Find the best parameters of the transport function with crossed method
+        
         Parameters
         ----------
         Xs : array_like, shape (n_source_samples, n_features)
@@ -347,6 +349,8 @@ class OptimalTransportGridSearch:
 
     def _find_best_parameters_circular(self, Xs, ys, Xt, yt):
         """
+        Find the best parameters of the transport function with circular method
+        
         Parameters
         ----------
         Xs : array_like, shape (n_source_samples, n_features)
@@ -403,7 +407,9 @@ class RasterOptimalTransport(OptimalTransportGridSearch):
                  transport_function = ot.da.MappingTransport, 
                  params=None, 
                  verbose=True):
-                     
+        """
+        Initialize Python Optimal Transport for raster processing.
+        """             
         super().__init__(transport_function,params,verbose)
         
 
@@ -419,6 +425,30 @@ class RasterOptimalTransport(OptimalTransportGridSearch):
                      in_group_source = None,
                      in_group_target = None,
                      scaler = StandardScaler):
+        """
+        Scale all image (if it is asked) and stock the input parameters in the object .
+        
+        Parameters
+        ----------
+        in_image_source : str.
+            source image (*.tif) --> path + file name 
+        in_image_target : str.
+            target image (*.tif) --> path + file name 
+        in_vector_source : str.
+            labels (*.gpkg) --> path + file name 
+        in_vector_target : str.
+            labels (*.gpkg) --> path + file name 
+        in_label_source : str.
+            name of the label colum in vector file (source)
+        in_label_source : str.
+            name of the label colum in vector file (target)
+        in_group_source : str.
+            name of the group colum of each polygon in vector file (source)
+        in_group_target : str.
+            name of the group colum of each polygon in vector file (target)
+        scaler: scale function (default=StandardScaler)
+            The function used to scale source and target image
+        """
        
         self._share_args(in_image_source=in_image_source,
                          in_image_target=in_image_target,
@@ -545,18 +575,54 @@ class RasterOptimalTransport(OptimalTransportGridSearch):
     
     
     def predict_transfer(self, data):
-                       
+        """
+        Predict model using domain adaptation.
+
+        Parameters
+        ----------        
+        data : arr.
+            Vector to transfer
+        
+        Return
+        ----------        
+        transport : arr
+            tranfered vector 
+        """                       
         transport = self.transport_model.transform(data)   
         return transport
 
     #fonctions rajoutées pour avoir les mêmes dimensions 
     def im2mat(self,img):
-        """Converts and image to matrix (one pixel per line)"""
+        """
+        Converts an image to matrix (one pixel per line)
+        
+        Parameters
+        ----------
+        img : arr.
+            array to reshape
+        
+        Return
+        ----------        
+        reshape img             
+        """
         return img.reshape((img.shape[0] * img.shape[1], img.shape[2]))
     
     
     def mat2im(self,X, shape):
-        """Converts back a matrix to an image"""
+        """
+        Converts back a matrix to an image
+        
+        Parameters
+        ----------
+        X : arr.
+            array to reshape
+        shape
+            shape of the image 
+        
+        Return
+        ----------        
+        reshape img                     
+        """
         return X.reshape(shape)    
 
 
