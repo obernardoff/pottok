@@ -98,7 +98,8 @@ class OptimalTransportGridSearch:
         if self._is_grid_search() :         
             self._find_best_parameters_circular(self.Xs, ys=self.ys, Xt=self.Xt, yt=self.yt)    
         else : 
-            self.transport_model.fit(self.Xs, ys=self.ys, Xt=self.Xt, yt=self.yt) 
+            self.transport_model = self.transport_function(**self.params_ot)
+            self.transport_model.fit(self.Xs, ys=self.ys, Xt=self.Xt, yt=self.yt,) 
             
         return self.transport_model
     
@@ -306,13 +307,15 @@ class OptimalTransportGridSearch:
             return False
 
     def _generate_params_from_grid_search(self):
-        
+        self.param_grids = []
         hyper_param = {key: self.params_ot[key] for key in self.param_grid} 
         items = sorted(hyper_param.items())
         keys, values = zip(*items)
         for v in product(*values):
             params_to_add = dict(zip(keys, v))
             self.params_ot.update(params_to_add)
+            self.param_grids.append(self.params_ot)
+            
             yield self.params_ot
 
 

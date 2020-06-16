@@ -13,8 +13,9 @@ __pycache__
 *.py.md5
 
 # MTB
-MuseoToolBox.egg-info/
+pottok.egg-info/
 cv_*.sqlite
+.spyproject/
 
 # sphinx-gallery temp files
 # Sphinx documentation
@@ -28,6 +29,7 @@ docs/source/auto_examples/**.pickle
 docs/source/auto_examples/
 docs/source/auto_examples/**.md5
 docs/modules/
+
 
 # Distribution / packaging
 .Python
