@@ -6,14 +6,15 @@ Created on Wed Jun  3 14:34:33 2020
 """
 
 
-from pottok import OptimalTransportGridSearch,RasterOptimalTransport
+import pottok
 import museotoolbox as mtb
 import ot
 import museopheno as mp
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.model_selection import GridSearchCV,StratifiedKFold
 from sklearn.preprocessing import StandardScaler #centrer-réduire
-
+from matplotlib import pyplot as plt
+from mpl_toolkits.mplot3d import Axes3D  # noqa: F401 unused import
     
 
 user = 'olivia'
@@ -49,10 +50,11 @@ Xt_ndvi = s2_ts.generate_index(Xs, s2_ts.get_index_expression('ACORVI'))  #calcu
 #Xs et Xt normaux
 ###################
 
+###################
 #crossed non scale
 
 print("Xs et Xt non scaled - crossed")
-test_crossed = OptimalTransportGridSearch(transport_function = ot.da.MappingTransport,
+test_crossed = pottok.OptimalTransportGridSearch(transport_function = ot.da.MappingTransport,
                               params=dict(mu=[2.0,0.1], eta=[10.0,2.0]))
 
 test_crossed.preprocessing(Xs,ys,Xt,yt,scaler = False)
@@ -65,10 +67,11 @@ test_crossed.improve(Xs_transform_crossed)
 print("----------------------------------")
 print("----------------------------------")
 
+###################
 #crossed scale
 
 print("Xs et Xt scaled - crossed")
-test_crossed_scale = OptimalTransportGridSearch(transport_function = ot.da.MappingTransport,
+test_crossed_scale = pottok.OptimalTransportGridSearch(transport_function = ot.da.MappingTransport,
                               params=dict(mu=[2.0,0.1], eta=[10.0,2.0]))
 
 test_crossed_scale.preprocessing(Xs,ys,Xt,yt,scaler = StandardScaler)
@@ -82,10 +85,47 @@ print("----------------------------------")
 print("----------------------------------")
 
 
+#représentation
+rouges = Xs[:,2]
+verts = Xs[:,1]
+bleus = Xs[:,0]
+
+rouget = Xt[:,2]
+vertt = Xt[:,1]
+bleut = Xt[:,0]
+
+rougetrans = Xs_transform_crossed[:,2]
+verttrans = Xs_transform_crossed[:,1]
+bleutrans = Xs_transform_crossed[:,0]
+
+#2d
+
+plt.figure(1)
+plt.clf()
+plt.scatter(rouges,bleus, c="red", marker='+', label='Source')
+plt.scatter(rouget,bleut, c="blue", marker='o', label='Target')
+plt.scatter(rougetrans,bleutrans, c="green", marker='*', label='Source transported')
+plt.legend(loc=0)
+
+
+#3d
+fig=plt.figure(2)
+fig.clf()
+ax = fig.add_subplot(111, projection='3d')
+#ax.scatter(xs, ys, zs, marker=m)
+ax.scatter(rouges, verts, bleus, marker='+', label='Source', c = "rebeccapurple")
+ax.scatter(rouget, vertt, bleut, marker='o',label='Target', c = "steelblue", s = 30)
+ax.scatter(rougetrans, verttrans, bleutrans, marker='o',label='Source transported', c = "darkorange", s = 5)
+ax.set_xlabel('rouge')
+ax.set_ylabel('vert')
+ax.set_zlabel('bleu')
+ax.legend()
+
+###################
 #circular
 
 print("Xs et Xt scaled - circular")
-test_circular = OptimalTransportGridSearch(transport_function = ot.da.MappingTransport,
+test_circular = pottok.OptimalTransportGridSearch(transport_function = ot.da.MappingTransport,
                               params=dict(mu=[2.0,0.1], eta=[10.0,2.0]))
 test_circular.preprocessing(Xs,ys,Xt,yt,scaler = StandardScaler)
 #print(test_circular.Xs)
@@ -103,7 +143,7 @@ print("----------------------------------")
 ###################
 
 print("Xs et Xt scaled NDVI - crossed")
-test_ndvi = OptimalTransportGridSearch(transport_function = ot.da.MappingTransport,
+test_ndvi = pottok.OptimalTransportGridSearch(transport_function = ot.da.MappingTransport,
                               params=dict(mu=[2.0,0.1], eta=[10.0,2.0]))
 test_ndvi.preprocessing(Xs,ys,Xt,yt,scaler = StandardScaler)
 #print(test_ndvi.Xs)
@@ -121,7 +161,7 @@ print("----------------------------------")
 ###################
 
 print("Xs et Xt scaled on all image - crossed")
-test_raster = RasterOptimalTransport(transport_function = ot.da.MappingTransport,
+test_raster = pottok.RasterOptimalTransport(transport_function = ot.da.MappingTransport,
                               params=dict(mu=[2.0,0.1], eta=[10.0,2.0]))
 
 test_raster.preprocessing(in_image_source = wdir+source_image,
