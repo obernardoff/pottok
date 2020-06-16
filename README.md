@@ -1,4 +1,4 @@
-# POTTOK
+# POTTOK - v1
 
 ### Python Optimal Transport for Terrestrial Observation Knowledge
 
