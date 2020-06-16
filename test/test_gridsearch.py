@@ -30,7 +30,38 @@ Xt, yt = ot.datasets.make_data_classif(
 Xt[yt == 2] *= 3
 Xt = Xt + 4
 
-class TestCV(unittest.TestCase):
+class TestOTGS(unittest.TestCase):
+    def test_with_image(self):
+        
+        ##############################################################################
+        # Instantiate the different transport algorithms and fit them
+        # -----------------------------------------------------------
+        
+        # MappingTransport with linear kernel
+        ot_mapping_linear = ot.da.MappingTransport(
+            kernel="linear", mu=1e0, eta=1e-8, bias=True,
+            max_iter=20, verbose=True)
+        
+        ot_mapping_linear.fit(Xs=Xs, Xt=Xt)
+        
+        # for original source samples, transform applies barycentric mapping
+        transp_Xs_linear = ot_mapping_linear.transform(Xs=Xs)
+        
+        # for out of source samples, transform applies the linear mapping
+        transp_Xs_linear_new = ot_mapping_linear.transform(Xs=Xs_new)
+        
+        trans_grid = OptimalTransportGridSearch(transport_function = ot.da.MappingTransport,
+                            params=dict(kernel="linear", mu=1e0, eta=1e-8, bias=True,max_iter=20, verbose=True))
+        
+        
+        trans_grid.preprocessing(Xs,ys,Xt,yt,scaler = False)
+        trans_grid.fit_circular()
+        transp_Xs_linear_grid = trans_grid.predict_transfer(Xs)
+        transp_Xs_linear_grid_new = trans_grid.predict_transfer(Xs_new)
+        
+        assert( np.all(transp_Xs_linear_new == transp_Xs_linear_grid_new) )
+        assert( np.all(transp_Xs_linear == transp_Xs_linear_grid) )
+    
     def Xs_transp_same_with_circular(self):
         
         ##############################################################################
