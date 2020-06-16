@@ -1,0 +1,40 @@
+dist: bionic
+language: python
+os : linux
+python:
+  - "3.6"
+  - "3.7"
+  - "3.8"
+
+addons:
+   apt:
+     packages:
+     - libgdal-dev
+
+before_install:
+  - sudo add-apt-repository --yes ppa:ubuntugis/ppa
+  - sudo apt-get --quiet update
+  - sudo apt-get install --yes libgdal-dev gdal-bin
+install:
+  - pip install gdal==`gdal-config --version`
+  - pip install -r requirements.txt
+  - pip install .
+  - pip install codecov
+  - pip install pytest-cov pytest
+
+script:
+- python setup.py develop
+- pytest -v  --cov=museotoolbox
+
+deploy:
+  provider: pypi
+  user: OB???
+  password:
+    secure: ??
+  on:
+    tags: true
+    branch: master
+  skip_existing: true
+
+after_success:
+ - codecov 
