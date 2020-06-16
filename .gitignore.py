@@ -5,6 +5,7 @@
 *.py~
 *_filtered*
 *.swp
+
 .spyproject/
 .spyproject/config
 __pycache__/
@@ -16,7 +17,6 @@ __pycache__/
 # MTB
 pottok.egg-info/
 cv_*.sqlite
-.spyproject/
 
 # sphinx-gallery temp files
 # Sphinx documentation
@@ -89,5 +89,4 @@ ENV/
 cov_html/
 
 *.gpkg-shm
-
 *.gpkg-wal
