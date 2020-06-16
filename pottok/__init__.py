@@ -12,7 +12,11 @@
 # @author: Olivia Bernardoff, Nicolas Karasiak, Yousra Hamrouni & David Sheeren
 # @git: https://github.com/obernardoff/pottok/
 # ================================================================
+"""
+The :mod:`pottok` module gathers available classes and function for `pottok`.
+"""
 
+from . import datasets
 
 # general libraries
 
@@ -37,12 +41,12 @@ class OptimalTransportGridSearch:
 
     Parameters
     ----------
-    transport_function: class  of ot.da, optional (default=ot.da.MappingTransport)
+    transport_function: class of ot.da, optional (default=ot.da.MappingTransport)
         from ot.da. e.g ot
-    params_ot : dict
+    params_ot : dict, optional (default=None)
         parameters of the optimal transport funtion.
     verbose : boolean, optional (default=True)
-        gives informations about the object
+        Gives informations about the object
     """
 
     def __init__(self, 
@@ -99,7 +103,7 @@ class OptimalTransportGridSearch:
             self._find_best_parameters_circular(self.Xs, ys=self.ys, Xt=self.Xt, yt=self.yt)    
         else : 
             self.transport_model = self.transport_function(**self.params_ot)
-            self.transport_model.fit(self.Xs, ys=self.ys, Xt=self.Xt, yt=self.yt,) 
+            self.transport_model.fit(self.Xs, ys=self.ys, Xt=self.Xt, yt=self.yt) 
             
         return self.transport_model
     
@@ -138,9 +142,14 @@ class OptimalTransportGridSearch:
 
         self._share_args(group_s=group_s,group_t=group_t,cv_ot=cv_ot,cv_ai=cv_ai,classifier=classifier,parameters=parameters)
         
-        
-        Xt_valid, Xt_test, yt_valid, yt_test, groupt_valid, groupt_test = mtb.cross_validation.train_test_split(cv=cv_ai,X=self.Xt,y=self.yt,groups=self.group_t)                             
-        self._share_args(Xt_valid=Xt_valid, Xt_test=Xt_test,yt_valid=yt_valid, yt_test=yt_test, groupt_valid=groupt_valid, groupt_test=groupt_test)
+        if group_s is None:
+            
+            Xt_valid, Xt_test, yt_valid, yt_test = mtb.cross_validation.train_test_split(cv=cv_ai,X=self.Xt,y=self.yt)                             
+            self._share_args(Xt_valid=Xt_valid, Xt_test=Xt_test,yt_valid=yt_valid, yt_test=yt_test)
+        else:
+            
+            Xt_valid, Xt_test, yt_valid, yt_test, groupt_valid, groupt_test = mtb.cross_validation.train_test_split(cv=cv_ai,X=self.Xt,y=self.yt,groups=self.group_t)                             
+            self._share_args(Xt_valid=Xt_valid, Xt_test=Xt_test,yt_valid=yt_valid, yt_test=yt_test, groupt_valid=groupt_valid, groupt_test=groupt_test)
         
         #model with input parameters
         self._model = GridSearchCV(classifier,parameters,cv=cv_ai) 

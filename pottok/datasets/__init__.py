@@ -12,7 +12,6 @@
 # @author: Olivia Bernardoff, Nicolas Karasiak, Yousra Hamrouni & David Sheeren
 # @git: https://github.com/obernardoff/pottok/
 # ================================================================
-
 """
 The :mod:`pottok.datasets` module gathers available datasets for testing
 `pottok`.

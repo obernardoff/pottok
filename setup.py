@@ -57,7 +57,11 @@ setuptools.setup(
         "Topic :: Scientific/Engineering :: GIS",
         "Topic :: Scientific/Engineering :: Remote Sensing"
     ],
-    python_requires='>=3.6', #a confirmer 
+    python_requires='>=3.5', #a confirmer 
+    zip_safe=False,
+    package_data={
+      'pottok': ['datasets/blackpottok.jpg','datasets/brownpottok.jpg']
+   }
 )
 
 
