@@ -5,8 +5,9 @@
 *.py~
 *_filtered*
 *.swp
-**__pycache__**
 .spyproject/
+.spyproject/config
+__pycache__/
 
 # nb
 *.pickle
