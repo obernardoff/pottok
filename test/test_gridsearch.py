@@ -96,22 +96,24 @@ class TestOTGS(unittest.TestCase):
     
     def test_param_grids_sizes(self):
         
-        trans_grid = OptimalTransportGridSearch(transport_function = ot.da.MappingTransport,
-                        params=dict(kernel=["linear","gaussian"], mu=1e0, eta=1e-8, bias=True,max_iter=20, verbose=True))
+        trans_grid = OptimalTransportGridSearch(transport_function = ot.da.SinkhornTransport,
+                        params=dict(reg_e=[1e0,1e-1], max_iter=[10], verbose=True))
         trans_grid.preprocessing(Xs,ys,Xt,yt,scaler = False)
         trans_grid.fit_circular()
         score_no_scaled = trans_grid.best_score
         
-        trans_grid = OptimalTransportGridSearch(transport_function = ot.da.MappingTransport,
-                        params=dict(kernel=["linear","gaussian"], mu=1e0, eta=1e-8, bias=True,max_iter=20, verbose=True))
+        trans_grid = OptimalTransportGridSearch(transport_function = ot.da.SinkhornTransport,
+                        params=dict(reg_e=[1e0,1e-1], max_iter=10, verbose=True))
         trans_grid.preprocessing(Xs,ys,Xt,yt)
         trans_grid.fit_circular()
         score_scaled = trans_grid.best_score
         
+        assert(score_scaled < score_no_scaled)
+        
         assert(len(trans_grid.param_grids) == 2) # from gaussian and linear
         
-        trans_grid = OptimalTransportGridSearch(transport_function = ot.da.MappingTransport,
-                        params=dict(kernel=["linear","gaussian"], mu=np.asarray([1e0,1e-1]), eta=1e-8, bias=True,max_iter=20, verbose=True))
+        trans_grid = OptimalTransportGridSearch(transport_function = ot.da.SinkhornTransport,
+                        params=dict(reg_e=[1e0,1e-1], max_iter=[10,20], verbose=True))
         trans_grid.preprocessing(Xs,ys,Xt,yt)
         trans_grid.fit_circular()
         assert(len(trans_grid.param_grids) == 4)
