@@ -32,9 +32,9 @@ black_pottok = black_pottok/255
 # Optimal transport with SinkhornL1l2 with gridsearch
 # ----------------------------------------------------
 
-gridsearch_transport = pottok.OptimalTransportGridSearch(transport_function=ot.da.SinkhornL1l2Transport,
-                                        params=dict(reg_e=[1e0,1e-1]))
-gridsearch_transport.preprocessing(Xs=Xs,ys=ys,Xt=Xt,yt=yt,scaler=False)
+gridsearch_transport = pottok.OptimalTransportGridSearch(transport_function=ot.da.SinkhornTransport,
+                                        params=dict(reg_e=[1e-1,1e0]))
+gridsearch_transport.preprocessing(Xs=Xs,Xt=Xt,scaler=False)
 gridsearch_transport.fit_circular()
 
 
@@ -60,6 +60,6 @@ pl.title('Black pottok (Target)')
 pl.subplot(2, 2, 4)
 pl.imshow(Image_mapping_gs)
 pl.axis('off')
-pl.title('SinkhornL1l2 (Source to Target with labels)')
+pl.title('Sinkhorn (Source to Target with no labels)')
 
 pl.show()
