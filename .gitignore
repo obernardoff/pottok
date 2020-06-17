@@ -5,7 +5,7 @@
 *.py~
 *_filtered*
 *.swp
-
+*.tif.aux.xml
 .spyproject/
 .spyproject/config
 __pycache__/
