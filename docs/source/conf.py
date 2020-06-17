@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 #
-# Museo ToolBox documentation build configuration file, created by
+# pottok documentation build configuration file, created by
 # sphinx-quickstart on Sun Nov 11 11:34:29 2018.
 #
 # This file is execfile()d with the current directory set to its
