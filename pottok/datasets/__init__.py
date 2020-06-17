@@ -19,17 +19,20 @@ The :mod:`pottok.datasets` module gathers available datasets for testing
 import os
 __pathFile = os.path.dirname(os.path.realpath(__file__))
 
-from museotoolbox.processing import RasterMath
+from museotoolbox.processing import RasterMath,extract_ROI
 
-def load_pottoks(return_array=True):
+def load_pottoks(return_X_y=True,return_target=True):
     """
     Load two images of pottoks.
     
     Parameters
     -----------
+    return_X_y : bool, optional (default=True)
+        If True, will return the array where there are labels (X) and the labels (y)
+        If False, will return only X (the array of the image)
     return_array : bool, optional (default=True)
-        If False, will return path of the images.
         If True, will return two arrays
+        If False, will return path of the images.
     
     Examples
     --------
@@ -42,19 +45,26 @@ def load_pottoks(return_array=True):
     """
     brown_pottok_uri = os.path.join(
                 __pathFile,
-                'brownpottok.jpg')
+                'brownpottok')
     black_pottok_uri = os.path.join(
                 __pathFile,
-                'blackpottok.jpg')
+                'blackpottok')
     
-    if return_array:
+    to_return = []
+    if return_X_y:
+        Xs,ys = extract_ROI(brown_pottok_uri+'.tif',brown_pottok_uri+'.gpkg','level')
+        to_return.extend([Xs,ys])
         
-        brown_pottok_arr = [i for i in RasterMath(brown_pottok_uri,return_3d=True,block_size=[-1,-1],verbose=False).read_block_per_block()]
-        black_pottok_arr = [i for i in RasterMath(black_pottok_uri,return_3d=True,block_size=[-1,-1],verbose=False).read_block_per_block()]
+        if return_target:
+            Xt,yt = extract_ROI(black_pottok_uri+'.tif',black_pottok_uri+'.gpkg','level')
+            to_return.extend([Xt,yt])
         
-        return brown_pottok_arr[0].data, black_pottok_arr[0].data
-    
-    else:
         
-        return brown_pottok,black_pottok
-    
+    if return_X_y is False:
+        brown_pottok_arr = [i for i in RasterMath(brown_pottok_uri+'.tif',return_3d=True,block_size=[-1,-1],verbose=False).read_block_per_block()]
+        to_return.append(brown_pottok_arr[0].data)
+        if return_target:
+            black_pottok_arr = [i for i in RasterMath(black_pottok_uri+'.tif',return_3d=True,block_size=[-1,-1],verbose=False).read_block_per_block()]
+            to_return.append(black_pottok_arr[0].data)
+        
+    return to_return

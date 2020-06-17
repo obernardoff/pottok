@@ -393,11 +393,9 @@ class OptimalTransportGridSearch:
         self.best_score = None
         for gridOT in self._generate_params_from_grid_search():
             transport_model_tmp = self.transport_function(**gridOT)
-            transport_model_tmp.fit(Xs, ys, Xt, yt)
-            from ot.da import BaseTransport
-            transp_Xt = BaseTransport.inverse_transform(#pour faire le retour
-                transport_model_tmp, Xs=Xs, ys=ys, Xt=Xt, yt=yt)
-            currentScore = mean_squared_error(Xs, transp_Xt) #regarde les différences d'allé retour
+            transport_model_tmp.fit(Xs=Xs, ys=ys, Xt=Xt, yt=yt)
+            in_trans_Xs = transport_model_tmp.inverse_transform(Xs=Xt, Xt=Xs)
+            currentScore = mean_squared_error(Xs, in_trans_Xs) #regarde les différences d'aller retour
 
             if self.verbose:
                 print(

@@ -60,7 +60,7 @@ setuptools.setup(
     python_requires='>=3.5', #a confirmer 
     zip_safe=False,
     package_data={
-      'pottok': ['datasets/blackpottok.jpg','datasets/brownpottok.jpg']
+      'pottok': ['datasets/blackpottok.jpg','datasets/brownpottok.jpg','datasets/brownpottok.gpkg','datasets/brownpottok.gpkg']
    }
 )
 
