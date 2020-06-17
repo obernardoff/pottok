@@ -74,7 +74,7 @@ pl.title('Black pottok (Target)')
 pl.subplot(2, 2, 4)
 pl.imshow(Image_mapping_gs)
 pl.axis('off')
-pl.title('SinkhornL1l2 (Source to Target)')
+pl.title('SinkhornL1l2 (Source to Target with labels)')
 
 pl.show()
 
