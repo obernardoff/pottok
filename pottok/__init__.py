@@ -88,16 +88,25 @@ class OptimalTransportGridSearch:
 
 
 
-    def fit_circular(self):
+    def fit_circular(self,metrics=mean_squared_error,greater_is_better=False):
         """
         Learn domain adaptation model with circular tuning (fitting).
         
+        Parameters
+        -----------
+        metrics : function, optional (default=mean_squared_error)
+            Need a function that takes two array as parameters
+        greater_is_better : bool, optional (default=False) 
+            If mean_squared_error, the lower is the better. Else, if overall accuracy fo rexample greater_is_better is True.
+            
         Returns
-        -------
+        --------
         transport_model : object
             The output model fitted
 
         """
+        self.metrics = metrics
+        self.greater_is_better = greater_is_better
         
         if self._is_grid_search() :         
             self._find_best_parameters_circular(self.Xs, ys=self.ys, Xt=self.Xt, yt=self.yt)    
@@ -391,39 +400,39 @@ class OptimalTransportGridSearch:
             Label target array (1d). 
         """  
         self.best_score = None
+    
         for gridOT in self._generate_params_from_grid_search():
             transport_model_tmp = self.transport_function(**gridOT)
             transport_model_tmp.fit(Xs=Xs, ys=ys, Xt=Xt, yt=yt)
             in_trans_Xs = transport_model_tmp.inverse_transform(Xs=Xt, Xt=Xs)
-            currentScore = mean_squared_error(Xs, in_trans_Xs) #regarde les différences d'aller retour
+            current_score = self.metrics(Xs, in_trans_Xs) #regarde les différences d'aller retour
 
             if self.verbose:
                 print(
-                    'RMSE is : ' + str(currentScore))
-
-            if self.best_score is None or self.best_score > currentScore:
-                self.best_score = currentScore
+                    '{} is : {}'.format(self.metrics.__name__,current_score))
+            
+            need_update_best_score = False
+            
+            if self.best_score is None :
+                need_update_best_score = True
+            else:
+                if self.greater_is_better:
+                    # if greater is better, current score need to be higher
+                    need_update_best_score = self.best_score < current_score
+                else:   
+                    # if greater is not better, current score need to be lower
+                    need_update_best_score = self.best_score > current_score
+                
+            if need_update_best_score : # if need to update best score
+                self.best_score = current_score
                 self.best_params = gridOT.copy() #met à jour les meilleurs paramètres si on a obtenu le 
-                                                 #meilleur score
+                                                     #meilleur score
                 self.transport_model = transport_model_tmp
         if self.verbose:
             print('Best grid is ' +
                          str(self.best_params))
             print('Best score is ' +
                          str(self.best_score))
-
-        
-
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -439,7 +448,6 @@ class RasterOptimalTransport(OptimalTransportGridSearch):
         super().__init__(transport_function,params,verbose)
         
 
-     
 
     def preprocessing(self,                  
                      in_image_source = None,

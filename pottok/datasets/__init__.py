@@ -28,20 +28,19 @@ def load_pottoks(return_X_y=True,return_target=True):
     Parameters
     -----------
     return_X_y : bool, optional (default=True)
-        If True, will return the array where there are labels (X) and the labels (y)
-        If False, will return only X (the array of the image)
-    return_array : bool, optional (default=True)
-        If True, will return two arrays
-        If False, will return path of the images.
+        If True, will return the array in 2d where there are labels (X) and the labels (y)
+        If False, will return only X in 3d (the array of the image)
+    return_target : bool, optional (default=True)
+        If True, will return two arrays in a list
+        If False, will return only the source (a brown pottok)
     
     Examples
     --------
-    >>> brown_pottok,black_pottok = load_pottoks()
-    >>> brown_pottok.shape
-    (320, 462, 3)
-    >>> black_pottok.shape
-    (450, 600, 3)
-    
+    >>> brown_pottok_arr, brown_pottok_label = load_pottoks(return_target=False)
+    >>> brown_pottok_arr.shape
+    (4610, 3)
+    >>> brown_pottok_label.shape
+    (4610,)
     """
     brown_pottok_uri = os.path.join(
                 __pathFile,
@@ -61,10 +60,11 @@ def load_pottoks(return_X_y=True,return_target=True):
         
         
     if return_X_y is False:
-        brown_pottok_arr = [i for i in RasterMath(brown_pottok_uri+'.tif',return_3d=True,block_size=[-1,-1],verbose=False).read_block_per_block()]
-        to_return.append(brown_pottok_arr[0].data)
+        brown_pottok_arr = RasterMath(brown_pottok_uri+'.tif',return_3d=True,verbose=False).get_image_as_array()
+    
+        to_return.append(brown_pottok_arr)
         if return_target:
-            black_pottok_arr = [i for i in RasterMath(black_pottok_uri+'.tif',return_3d=True,block_size=[-1,-1],verbose=False).read_block_per_block()]
-            to_return.append(black_pottok_arr[0].data)
+            black_pottok_arr = RasterMath(black_pottok_uri+'.tif',return_3d=True,verbose=False).get_image_as_array()
+            to_return.append(black_pottok_arr)
         
     return to_return
