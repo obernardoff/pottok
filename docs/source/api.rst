@@ -5,9 +5,9 @@ API Reference
 
 The complete Pottok project is automatically documented for every module.
 
-.. currentmodule:: pottok
-
 .. autosummary::
-   :toctree: modules/
-   :template: module.rst
-   
+    :toctree: api/
+    :template: autosummary/class.rst
+
+    pottok.OptimalTransportGridSearch
+    pottok.RasterOptimalTransport

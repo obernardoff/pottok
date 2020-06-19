@@ -497,15 +497,15 @@ class RasterOptimalTransport(OptimalTransportGridSearch):
         Scale all image (if it is asked) and stock the input parameters in the object .
 
         Parameters
-        ----------
+        -----------
         in_image_source : str.
-            source image (*.tif) --> path + file name
+            source image (gdal supported raster) -> path + file name
         in_image_target : str.
-            target image (*.tif) --> path + file name
+            target image (gdal supported raster) -> path + file name
         in_vector_source : str.
-            labels (*.gpkg) --> path + file name
+            labels (gdal supported vector) -> path + file name
         in_vector_target : str.
-            labels (*.gpkg) --> path + file name
+            labels (gdal supported vectorR) -> path + file name
         in_label_source : str.
             name of the label colum in vector file (source)
         in_label_source : str.
@@ -516,6 +516,7 @@ class RasterOptimalTransport(OptimalTransportGridSearch):
             name of the group colum of each polygon in vector file (target)
         scaler: scale function (default=StandardScaler)
             The function used to scale source and target image
+            
         """
 
         self._share_args(in_image_source=in_image_source,
