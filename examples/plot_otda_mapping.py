@@ -68,9 +68,8 @@ pl.title('Source and target distributions')
 
 
 # MappingTransport with circular validation
-pottok_circular = pottok.OptimalTransportGridSearch(transport_function = ot.da.MappingTransport,
-                              params=dict(mu=[2.0,0.1], eta=[10.0,2.0], kernel=["gaussian","linear"], bias=True,
-                              max_iter=20, verbose=True))
+pottok_circular = pottok.OptimalTransportGridSearch(transport_function = ot.da.LinearTransport,
+                              params=dict(reg=[0.1,1.0]))
 pottok_circular.preprocessing(Xs=Xs,ys=ys,Xt=Xt,yt=yt)
 
 pottok_circular.fit_circular()

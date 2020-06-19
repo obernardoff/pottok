@@ -64,7 +64,7 @@ class OptimalTransportGridSearch:
                       ys=None,
                       Xt=None,
                       yt=None,
-                      scaler=StandardScaler):
+                      scaler=False):
         """
         Stock the input parameters in the object and scaled it if it is asked.
 
@@ -78,7 +78,7 @@ class OptimalTransportGridSearch:
             Target domain array.
         yt: array_like, shape (n_source_samples,)
             Label target array (1d).
-        scaler: scale function (default=StandardScaler)
+        scaler: scale function (default=False)
             The function used to scale Xs and Xt
         """
 
@@ -437,9 +437,9 @@ class OptimalTransportGridSearch:
         for gridOT in self._generate_params_from_grid_search():
             transport_model_tmp = self.transport_function(**gridOT)
             transport_model_tmp.fit(Xs=Xs, ys=ys, Xt=Xt, yt=yt)
-            
+
             transp_Xs = transport_model_tmp.inverse_transform(
-                transport_model_tmp, Xs=Xt, ys=yt, Xt=Xs, yt=ys)
+                Xs=Xt, ys=yt, Xt=Xs, yt=ys)
             # regarde les différences d'aller-retour
             current_score = mean_squared_error(Xs, transp_Xs)
 
