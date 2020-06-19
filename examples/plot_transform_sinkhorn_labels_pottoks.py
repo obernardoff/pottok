@@ -13,18 +13,8 @@ import ot
 import pottok
 
 
-def im2mat(img):
-    return img.reshape((img.shape[0] * img.shape[1], img.shape[2]))
-
-def mat2im(X, shape):
-    return X.reshape(shape)    
-
-def minmax(img):
-    return np.clip(img, 0, 1)
-
-
 ##############################################################################
-# Generate data
+# Load pottoks
 # -------------
 
 # Loading X and y
