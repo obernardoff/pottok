@@ -55,12 +55,12 @@ def load_pottoks(return_X_y=True,return_target=True):
         Xs,ys = extract_ROI(brown_pottok_uri+'.tif',brown_pottok_uri+'.gpkg','level')
         to_return.extend([Xs,ys])
         
-        if return_target:
+        if return_target: #to have only labels
             Xt,yt = extract_ROI(black_pottok_uri+'.tif',black_pottok_uri+'.gpkg','level')
             to_return.extend([Xt,yt])
         
         
-    if return_X_y is False:
+    if return_X_y is False: #for all image and no label
         brown_pottok_arr = [i for i in RasterMath(brown_pottok_uri+'.tif',return_3d=True,block_size=[-1,-1],verbose=False).read_block_per_block()]
         to_return.append(brown_pottok_arr[0].data)
         if return_target:
