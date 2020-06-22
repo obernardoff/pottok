@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """
 =====================================================
-OT for image color adaptation with labels
+OT for image color adaptation with labels -test
 =====================================================
 
 Using sinkhorn L1l2
@@ -47,7 +47,7 @@ Image_mapping_gs = X1tl.reshape(*brown_pottok.shape)
 
 pl.figure(2, figsize=(10,8))
 
-pl.subplot(2, 2, 1)
+pl.subplot(1, 2, 1)
 pl.imshow(brown_pottok)
 pl.axis('off')
 pl.title('Brown pottok (Source)')
