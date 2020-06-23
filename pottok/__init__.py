@@ -528,6 +528,7 @@ class RasterOptimalTransport(OptimalTransportGridSearch):
                          in_group_source=in_group_source,
                          in_group_target=in_group_target,
                          scaler=scaler)
+        
 
         # faire extract ROI à partir de l'image pour obtenir les positions
         Xs, ys, group_s, pos_s = mtb.processing.extract_ROI(self.in_image_source,
@@ -641,6 +642,85 @@ class RasterOptimalTransport(OptimalTransportGridSearch):
             self.image_source_reshape = bande_source_reshape
             self.image_target_reshape = bande_target_reshape
             print("Image is not scaled")
+            
+            
+    def preprocessing_rm(self,
+                      in_image_source=None,
+                      in_image_target=None,
+                      in_vector_source=None,
+                      in_vector_target=None,
+                      in_label_source=None,
+                      in_label_target=None,
+                      in_group_source=None,
+                      in_group_target=None,
+                      scaler=StandardScaler):
+        """
+        Scale all image (if it is asked) and stock the input parameters in the object .
+
+        Parameters
+        -----------
+        in_image_source : str.
+            source image (gdal supported raster) -> path + file name
+        in_image_target : str.
+            target image (gdal supported raster) -> path + file name
+        in_vector_source : str.
+            labels (gdal supported vector) -> path + file name
+        in_vector_target : str.
+            labels (gdal supported vectorR) -> path + file name
+        in_label_source : str.
+            name of the label colum in vector file (source)
+        in_label_source : str.
+            name of the label colum in vector file (target)
+        in_group_source : str.
+            name of the group colum of each polygon in vector file (source)
+        in_group_target : str.
+            name of the group colum of each polygon in vector file (target)
+        scaler: scale function (default=StandardScaler)
+            The function used to scale source and target image
+            
+        """
+
+        self._share_args(in_image_source=in_image_source,
+                         in_image_target=in_image_target,
+                         in_vector_source=in_vector_source,
+                         in_vector_target=in_vector_target,
+                         in_label_source=in_label_source,
+                         in_label_target=in_label_target,
+                         in_group_source=in_group_source,
+                         in_group_target=in_group_target,
+                         scaler=scaler)
+        
+        Xs, ys, group_s = mtb.processing.extract_ROI(self.in_image_source,
+                                                            self.in_vector_source,
+                                                            self.in_label_source,
+                                                            self.in_group_source)  # Xsource ysource
+
+        Xt, yt, group_t= mtb.processing.extract_ROI(self.in_image_target,
+                                                            self.in_vector_target,
+                                                            self.in_label_target,
+                                                            self.in_group_target)  # Xsource ysource
+
+        self.Xs_non_scale = Xs
+        self.Xt_non_scale = Xt
+        self.ys = ys
+        self.yt = yt
+        self.group_s = group_s
+        self.group_t = group_t       
+        
+        source_array = mtb.processing.RasterMath(in_image_source,return_3d=False,
+                                      verbose=False).get_image_as_array()
+        
+        target_array = mtb.processing.RasterMath(in_image_target,return_3d=False,
+                                      verbose=False).get_image_as_array()
+        
+        
+
+        
+        self._prefit_image(source_array,target_array)
+        self.Xs = self.source_scaler.transform(self.Xs_non_scale)
+        self.Xt = self.target_scaler.transform(self.Xt_non_scale)
+        print("Image is scaled")        
+        
 
     def predict_transfer(self, data):
         """
@@ -691,23 +771,70 @@ class RasterOptimalTransport(OptimalTransportGridSearch):
         reshape img
         """
         return X.reshape(shape)
-
-    def _to_scale(self, data, method):
+    
+    
+    def _prefit_image(self, source, target):
         """
+        Scale source and target
+
+        Parameters
+        ----------
+        source : array_like, shape (n_source_samples, n_features)
+            Source domain array.
+        target : array_like, shape (n_source_samples,)
+            Label source array (1d).
+        """
+
+
+        if self._need_scale:
+            # permet de stocker le scaler fitté
+            self.source_scaler = self._to_scale(source, self.scaler)
+            self.source = self.source_scaler.transform(source)
+            self.target_scaler = self._to_scale(target, self.scaler)
+            self.target = self.target_scaler.transform(target)
+            print("source and target are scaled")
+        else:
+            print("source and target are not scaled")
+
+
+    def predict_transfer(self, data):
+        """
+        Predict model using domain adaptation.
+
         Parameters
         ----------
         data : arr.
-            data to scale
-        method : function.
-            scaler method
+            Vector to transfer
 
-        Returns
-        -------
-        scale : arr.
-            scaled data
+        Return
+        ----------
+        transport : arr
+            tranfered vector
         """
 
-        scaler = method()
-        scaler.fit(data)
-        scale = scaler.transform(data)
-        return scale
+
+        data = self.transport_model.transform(data)
+        if self.scaler is not False:
+            data = self.source_scaler.inverse_transform(data)
+        return data            
+            
+
+    # def _to_scale(self, data, method):
+    #     """
+    #     Parameters
+    #     ----------
+    #     data : arr.
+    #         data to scale
+    #     method : function.
+    #         scaler method
+
+    #     Returns
+    #     -------
+    #     scale : arr.
+    #         scaled data
+    #     """
+
+    #     scaler = method()
+    #     scaler.fit(data)
+    #     scale = scaler.transform(data)
+    #     return scale

@@ -21,7 +21,7 @@ import os
 __pathFile = os.path.dirname(os.path.realpath(__file__))
 
 
-def load_pottoks(return_X_y=True, return_target=True):
+def load_pottoks(return_X_y=True, return_target=True, return_only_path=False):
     """
     Load two images of pottoks.
 
@@ -50,17 +50,27 @@ def load_pottoks(return_X_y=True, return_target=True):
         'blackpottok')
 
     to_return = []
-    if return_X_y:
+    
+    if return_only_path :
+        to_return.extend([brown_pottok_uri + '.tif', brown_pottok_uri + '.gpkg'])  
+        if return_target : 
+            to_return.extend([black_pottok_uri + '.tif', black_pottok_uri + '.gpkg'])  
+
+        
+        
+    elif return_X_y:
         Xs, ys = extract_ROI(brown_pottok_uri + '.tif',
                              brown_pottok_uri + '.gpkg', 'level')
         to_return.extend([Xs, ys])
+        
+
 
         if return_target:
             Xt, yt = extract_ROI(
                 black_pottok_uri + '.tif', black_pottok_uri + '.gpkg', 'level')
             to_return.extend([Xt, yt])
 
-    if return_X_y is False:
+    elif return_X_y is False:
         brown_pottok_arr = RasterMath(
             brown_pottok_uri + '.tif',
             return_3d=True,
