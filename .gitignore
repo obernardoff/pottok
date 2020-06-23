@@ -5,15 +5,17 @@
 *.py~
 *_filtered*
 *.swp
-__pycache__
-*.spyproject/*
+*.tif.aux.xml
+.spyproject/
+.spyproject/config
+__pycache__/
 
 # nb
 *.pickle
 *.py.md5
 
 # MTB
-MuseoToolBox.egg-info/
+pottok.egg-info/
 cv_*.sqlite
 
 # sphinx-gallery temp files
@@ -28,6 +30,7 @@ docs/source/auto_examples/**.pickle
 docs/source/auto_examples/
 docs/source/auto_examples/**.md5
 docs/modules/
+
 
 # Distribution / packaging
 .Python
@@ -86,5 +89,4 @@ ENV/
 cov_html/
 
 *.gpkg-shm
-
 *.gpkg-wal
