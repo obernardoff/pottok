@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 """
-=====================================================
-OT for image color adaptation with labels -test
-=====================================================
+=======================================================================
+OT for image color adaptation with labels - OptimalTransportGridSearch
+=======================================================================
 
 Using sinkhorn L1l2
 """
@@ -45,9 +45,9 @@ gridsearch_transport.fit_circular()
 X1tl = gridsearch_transport.predict_transfer(brown_pottok.reshape(-1,3))
 Image_mapping_gs = X1tl.reshape(*brown_pottok.shape)
 
-pl.figure(2, figsize=(10,8))
+pl.figure(1, figsize=(10,8))
 
-pl.subplot(1, 2, 1)
+pl.subplot(2, 2, 1)
 pl.imshow(brown_pottok)
 pl.axis('off')
 pl.title('Brown pottok (Source)')
