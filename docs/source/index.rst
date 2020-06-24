@@ -15,7 +15,18 @@ Pottok documentation
        :class: avatar
        :target: https://github.com/nkarasiak/
 
-    :Authors: `Olivia Bernardoff <https://github.com/obernardoff/>`_, `Nicolas Karasiak <https://github.com/nkarasiak/>`_
+    .. image :: https://github.com/yousrah.png?size=80
+       :alt: Yousra Hamrouni
+       :class: avatar
+       :target: https://github.com/yousrah
+    
+    .. image :: https://github.com/dsheeren.png?size=80
+       :alt: David Sheeren
+       :class: avatar
+       :target: https://github.com/dsheeren
+
+    :Authors: `Olivia Bernardoff <https://github.com/obernardoff/>`_, `Nicolas Karasiak <https://github.com/nkarasiak/>`_, `Yousra Hamrouni <https://github.com/yousrah>`_ and `David Sheeren <https://github.com/dsheeren>`_.
+
     :Source code: `github.com project <https://github.com/obernardoff/pottok>`_
     :Bug tracker: `github.com issues <https://github.com/obernardoff/pottok/issues>`_
     :Generated: |today|
