@@ -29,13 +29,7 @@
 - **mat2im**
 - **_to_scale** : scale les données entrées. 
 
-### Ce que j'ai constaté :
 
-En travaillant seulement sur les Xs et les XT, l'utilisation de la classe OptimalTransportGridSearch ne montre pas d'amélioration alors que RasterOptimalTransport montre une petite amélioration. Cela ne semble pas logique car en principe la seule différence est que dans un cas les données ont été  scalées seulement avec Xs et Xt et dans l'autre en fonction de toute l'image.
-
-Il y a aussi un problème, dans rot, comme le scale est fait bande par bande il est impossible d'appliquer l'inverse transform pour avoir les données transportées non scalées. Il faudrait stocker le fit du scaler bande par bande mais cela me semble fastidieux (et je ne suis pas sûre que cela fonctionne sur de grosses images).
-
-Bonne lecture !
 
 
 

@@ -221,7 +221,7 @@ class OptimalTransportGridSearch:
             data = self.Xs_scaler.inverse_transform(data)
         return data
 
-    def improve(self, Xs_transform, method="test"):
+    def assess_transport(self, Xs_transform, method="test"):
         """
         OA comparison before and after OT
 
