@@ -588,10 +588,15 @@ class RasterOptimalTransport(OptimalTransportGridSearch):
         transport : arr
             tranfered vector
         """
-        transport = self.transport_model.transform(data)
-        return transport
 
-    
+
+        data = self.transport_model.transform(data)
+        if self.scaler is not False:
+            data = self.source_scaler.inverse_transform(data)
+        return data  
+
+          
+            
     def _prefit_image(self, source, target):
         """
         Scale source and target
@@ -614,46 +619,3 @@ class RasterOptimalTransport(OptimalTransportGridSearch):
             print("source and target are scaled")
         else:
             print("source and target are not scaled")
-
-
-    def predict_transfer(self, data):
-        """
-        Predict model using domain adaptation.
-
-        Parameters
-        ----------
-        data : arr.
-            Vector to transfer
-
-        Return
-        ----------
-        transport : arr
-            tranfered vector
-        """
-
-
-        data = self.transport_model.transform(data)
-        if self.scaler is not False:
-            data = self.source_scaler.inverse_transform(data)
-        return data            
-            
-
-    # def _to_scale(self, data, method):
-    #     """
-    #     Parameters
-    #     ----------
-    #     data : arr.
-    #         data to scale
-    #     method : function.
-    #         scaler method
-
-    #     Returns
-    #     -------
-    #     scale : arr.
-    #         scaled data
-    #     """
-
-    #     scaler = method()
-    #     scaler.fit(data)
-    #     scale = scaler.transform(data)
-    #     return scale

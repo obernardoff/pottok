@@ -10,8 +10,8 @@
 - **preprocessing** : enregistre les Xs, ys, Xt, yt dans la classe et les scale si l'utilisateur le demande
 - **fit_circular** : cherche les meilleurs paramètres avec la méthode d'aller-retour et fit le modèle de transport avec les meilleurs paramètres 
 - **fit_crossed** : cherche les meilleurs paramètres avec la méthode que nous avons déterminée et fit le modèle de transport avec les meilleurs paramètres
-- **improve** : sert à évaluer l'apport du transport sur les données tests (possible uniquement après un fit_crossed qui sépare les Xt en valid/test)
 - **predict_transfert** : sert à transporter les données (les Xs, qui sont rescalée avec le même fit) --> Est-ce que l'utilisateur ne pourrait pas directement utiliser les Xs scalés stockés dans la classe ? 
+- **assess_transport** : sert à évaluer l'apport du transport sur les données tests (possible uniquement après un fit_crossed qui sépare les Xt en valid/test)
 - **_share_args** : stocke les paramètres rentrés dans l'objet 
 - **_prefit** : scale Xs et Xt
 - **_to_scale** : fit les données rentrées avec une fonction scaler choisie par l'utilisateur
