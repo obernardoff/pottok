@@ -483,168 +483,9 @@ class RasterOptimalTransport(OptimalTransportGridSearch):
         """
         super().__init__(transport_function, params, verbose)
 
+            
+            
     def preprocessing(self,
-                      in_image_source=None,
-                      in_image_target=None,
-                      in_vector_source=None,
-                      in_vector_target=None,
-                      in_label_source=None,
-                      in_label_target=None,
-                      in_group_source=None,
-                      in_group_target=None,
-                      scaler=StandardScaler):
-        """
-        Scale all image (if it is asked) and stock the input parameters in the object .
-
-        Parameters
-        -----------
-        in_image_source : str.
-            source image (gdal supported raster) -> path + file name
-        in_image_target : str.
-            target image (gdal supported raster) -> path + file name
-        in_vector_source : str.
-            labels (gdal supported vector) -> path + file name
-        in_vector_target : str.
-            labels (gdal supported vectorR) -> path + file name
-        in_label_source : str.
-            name of the label colum in vector file (source)
-        in_label_source : str.
-            name of the label colum in vector file (target)
-        in_group_source : str.
-            name of the group colum of each polygon in vector file (source)
-        in_group_target : str.
-            name of the group colum of each polygon in vector file (target)
-        scaler: scale function (default=StandardScaler)
-            The function used to scale source and target image
-            
-        """
-
-        self._share_args(in_image_source=in_image_source,
-                         in_image_target=in_image_target,
-                         in_vector_source=in_vector_source,
-                         in_vector_target=in_vector_target,
-                         in_label_source=in_label_source,
-                         in_label_target=in_label_target,
-                         in_group_source=in_group_source,
-                         in_group_target=in_group_target,
-                         scaler=scaler)
-        
-
-        # faire extract ROI à partir de l'image pour obtenir les positions
-        Xs, ys, group_s, pos_s = mtb.processing.extract_ROI(self.in_image_source,
-                                                            self.in_vector_source,
-                                                            self.in_label_source,
-                                                            self.in_group_source,
-                                                            get_pixel_position=True)  # Xsource ysource
-
-        pos_s = pos_s.astype(int)  # pour les mettre en entier
-
-        Xt, yt, group_t, pos_t = mtb.processing.extract_ROI(self.in_image_target,
-                                                            self.in_vector_target,
-                                                            self.in_label_target,
-                                                            self.in_group_target,
-                                                            get_pixel_position=True)  # Xtarget ytarget
-        pos_t = pos_t.astype(int)  # pour les mettre en entier
-
-        # 1.Scale de l'image
-        if self._need_scale:
-
-            # source
-            source = gdal.Open(self.in_image_source)
-            # pour stocker toutes les bandes --> shape : lignes, colonnes,
-            # bandes
-            bande_scale_source = np.zeros(
-                (source.RasterYSize, source.RasterXSize, source.RasterCount))
-            # pour stocker les Xs  --> shape : pixels, bandes
-            Xs_scale = np.zeros((Xs.shape[0], Xs.shape[1]))
-
-            for bande in range(source.RasterCount):
-                bande_i = source.GetRasterBand(bande + 1)
-                source_bande_i = bande_i.ReadAsArray()
-                scale_bande = self._to_scale(source_bande_i, self.scaler)
-                for i in range(Xs.shape[0]):
-                    Xs_scale[i, bande] = scale_bande[pos_s[i, 1], pos_s[i, 0]]
-                bande_scale_source[:, :, bande] = scale_bande
-
-            bande_scale_source_reshape = self.im2mat(bande_scale_source)
-
-            # target
-            target = gdal.Open(self.in_image_target)
-            bande_scale_target = np.zeros(
-                (target.RasterYSize, target.RasterXSize, target.RasterCount))  # idem
-            Xt_scale = np.zeros((Xt.shape[0], Xt.shape[1]))  # idem
-
-            for bande in range(target.RasterCount):
-                bande_i = target.GetRasterBand(bande + 1)
-                target_bande_i = bande_i.ReadAsArray()
-                scale_bande = self._to_scale(target_bande_i, self.scaler)
-                for i in range(Xt.shape[0]):
-                    Xt_scale[i, bande] = scale_bande[pos_t[i, 1], pos_t[i, 0]]
-                bande_scale_target[:, :, bande] = scale_bande
-
-            bande_scale_target_reshape = self.im2mat(bande_scale_target)
-
-            # c. stockage des données extraites
-            self.Xs_non_scale = Xs
-            self.Xs = Xs_scale
-            self.ys = ys
-            self.Xt_non_scale = Xt
-            self.Xt = Xt_scale
-            self.yt = yt
-            self.group_s = group_s
-            self.group_t = group_t
-            self.image_scale_source = bande_scale_source
-            self.image_scale_target = bande_scale_target
-            self.image_scale_source_reshape = bande_scale_source_reshape
-            self.image_scale_target_reshape = bande_scale_target_reshape
-            print("Image is scaled")
-
-        # 2.Si pas de scale, on extrait juste les Xs.
-        else:
-
-            # source
-            source = gdal.Open(self.in_image_source)
-            # pour stocker toutes les bandes --> shape : lignes, colonnes,
-            # bandes
-            bande_source = np.zeros(
-                (source.RasterYSize, source.RasterXSize, source.RasterCount))
-            for bande in range(source.RasterCount):
-                bande_i = source.GetRasterBand(bande + 1)
-                source_bande_i = bande_i.ReadAsArray()
-                bande_source[:, :, bande] = source_bande_i
-
-            bande_source_reshape = self.im2mat(bande_source)
-
-            # target
-            target = gdal.Open(self.in_image_target)
-            bande_target = np.zeros(
-                (target.RasterYSize,
-                 target.RasterXSize,
-                 target.RasterCount))  # idem
-            Xt_scale = np.zeros((Xt.shape[0], Xt.shape[1]))  # idem
-
-            for bande in range(target.RasterCount):
-                bande_i = target.GetRasterBand(bande + 1)
-                target_bande_i = bande_i.ReadAsArray()
-                bande_target[:, :, bande] = target_bande_i
-
-            bande_target_reshape = self.im2mat(bande_target)
-
-            # c.stockage des données extraites
-            self.Xs = Xs
-            self.ys = ys
-            self.Xt = Xt
-            self.yt = yt
-            self.group_s = group_s
-            self.group_t = group_t
-            self.image_source = bande_source
-            self.image_target = bande_target
-            self.image_source_reshape = bande_source_reshape
-            self.image_target_reshape = bande_target_reshape
-            print("Image is not scaled")
-            
-            
-    def preprocessing_rm(self,
                       in_image_source=None,
                       in_image_target=None,
                       in_vector_source=None,
@@ -700,26 +541,37 @@ class RasterOptimalTransport(OptimalTransportGridSearch):
                                                             self.in_label_target,
                                                             self.in_group_target)  # Xsource ysource
 
-        self.Xs_non_scale = Xs
-        self.Xt_non_scale = Xt
-        self.ys = ys
-        self.yt = yt
-        self.group_s = group_s
-        self.group_t = group_t       
-        
         source_array = mtb.processing.RasterMath(in_image_source,return_3d=False,
                                       verbose=False).get_image_as_array()
         
         target_array = mtb.processing.RasterMath(in_image_target,return_3d=False,
                                       verbose=False).get_image_as_array()
-        
-        
 
         
-        self._prefit_image(source_array,target_array)
-        self.Xs = self.source_scaler.transform(self.Xs_non_scale)
-        self.Xt = self.target_scaler.transform(self.Xt_non_scale)
-        print("Image is scaled")        
+        self.Xs = Xs
+        self.Xt = Xt
+        self.ys = ys
+        self.yt = yt        
+        self.group_s = group_s
+        self.group_t = group_t  
+
+        if self._need_scale : 
+
+            self.Xs_non_scaled = Xs
+            self.Xt_non_scaled = Xt
+            self._prefit_image(source_array,target_array)
+            self.Xs = self.source_scaler.transform(self.Xs_non_scaled)
+            self.Xt = self.target_scaler.transform(self.Xt_non_scaled)
+            print("Image is scaled") 
+            
+        else : 
+            
+            self.source = source_array.astype(float)
+            self.target = target_array.astype(float)        
+            self.Xs = self.Xs.astype(float)
+            self.Xt = self.Xt.astype(float)
+
+            print("Image is not scaled")
         
 
     def predict_transfer(self, data):
@@ -739,39 +591,6 @@ class RasterOptimalTransport(OptimalTransportGridSearch):
         transport = self.transport_model.transform(data)
         return transport
 
-    # fonctions rajoutées pour avoir les mêmes dimensions
-    def im2mat(self, img):
-        """
-        Converts an image to matrix (one pixel per line)
-
-        Parameters
-        ----------
-        img : arr.
-            array to reshape
-
-        Return
-        ----------
-        reshape img
-        """
-        return img.reshape((img.shape[0] * img.shape[1], img.shape[2]))
-
-    def mat2im(self, X, shape):
-        """
-        Converts back a matrix to an image
-
-        Parameters
-        ----------
-        X : arr.
-            array to reshape
-        shape
-            shape of the image
-
-        Return
-        ----------
-        reshape img
-        """
-        return X.reshape(shape)
-    
     
     def _prefit_image(self, source, target):
         """
