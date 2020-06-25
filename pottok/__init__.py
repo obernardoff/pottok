@@ -531,30 +531,54 @@ class RasterOptimalTransport(OptimalTransportGridSearch):
                          in_group_target=in_group_target,
                          scaler=scaler)
         
-        Xs, ys, group_s = mtb.processing.extract_ROI(self.in_image_source,
-                                                            self.in_vector_source,
-                                                            self.in_label_source,
-                                                            self.in_group_source)  # Xsource ysource
-
-        Xt, yt, group_t= mtb.processing.extract_ROI(self.in_image_target,
-                                                            self.in_vector_target,
-                                                            self.in_label_target,
-                                                            self.in_group_target)  # Xsource ysource
-
+        
+        if self.in_group_source is None :
+            
+            
+            Xs, ys = mtb.processing.extract_ROI(self.in_image_source,
+                                                self.in_vector_source,
+                                                self.in_label_source)  # Xsource ysource
+    
+            Xt, yt = mtb.processing.extract_ROI(self.in_image_target,
+                                                self.in_vector_target,
+                                                self.in_label_target)  # Xsource ysource
+    
+            
+            self.Xs = Xs
+            self.Xt = Xt
+            self.ys = ys
+            self.yt = yt        
+        
+        else : 
+            
+        
+            Xs, ys, group_s = mtb.processing.extract_ROI(self.in_image_source,
+                                                                self.in_vector_source,
+                                                                self.in_label_source,
+                                                                self.in_group_source)  # Xsource ysource
+    
+            Xt, yt, group_t= mtb.processing.extract_ROI(self.in_image_target,
+                                                                self.in_vector_target,
+                                                                self.in_label_target,
+                                                                self.in_group_target)  # Xsource ysource
+    
+            
+            self.Xs = Xs
+            self.Xt = Xt
+            self.ys = ys
+            self.yt = yt        
+            self.group_s = group_s
+            self.group_t = group_t 
+            
+            
+            
         source_array = mtb.processing.RasterMath(in_image_source,return_3d=False,
-                                      verbose=False).get_image_as_array()
-        
+                                          verbose=False).get_image_as_array()
+            
         target_array = mtb.processing.RasterMath(in_image_target,return_3d=False,
-                                      verbose=False).get_image_as_array()
+                                          verbose=False).get_image_as_array()
 
         
-        self.Xs = Xs
-        self.Xt = Xt
-        self.ys = ys
-        self.yt = yt        
-        self.group_s = group_s
-        self.group_t = group_t  
-
         if self._need_scale : 
 
             self.Xs_non_scaled = Xs
