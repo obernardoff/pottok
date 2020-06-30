@@ -62,7 +62,7 @@ class TestOTGS(unittest.TestCase):
         assert( np.all(transp_Xs_linear_new == transp_Xs_linear_grid_new) )
         assert( np.all(transp_Xs_linear == transp_Xs_linear_grid) )
     
-    def Xs_transp_same_with_circular(self):
+    def test_Xs_transp_same_with_circular(self):
         
         ##############################################################################
         # Instantiate the different transport algorithms and fit them

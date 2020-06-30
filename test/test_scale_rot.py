@@ -2,8 +2,11 @@
 TestUnit for scaler in pottok
 """
 import unittest
+
 import os
+
 import pottok
+
 import museotoolbox as mtb
 from sklearn.preprocessing import StandardScaler  # centrer-réduire
 
@@ -20,9 +23,8 @@ label = 'level'
 group = 'level'
 
 
-
 class TestPottokScale(unittest.TestCase):
-    def check_scaler(self):
+    def test_scaler(self):
 
         rot_test = pottok.RasterOptimalTransport()
         rot_test._need_scale=True
