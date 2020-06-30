@@ -90,3 +90,4 @@ cov_html/
 
 *.gpkg-shm
 *.gpkg-wal
+*.pyc
