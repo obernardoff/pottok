@@ -221,7 +221,33 @@ class OptimalTransportGridSearch:
             data = self.Xs_scaler.inverse_transform(data)
         return data
 
-    def assess_transport(self, Xs_transform, method="test"):
+    def valid_fit_crossed(self, Xs_transform):
+        """
+        OA comparison before and after OT with Xt_test 
+
+        Parameters
+        ----------
+        Xs_transform : array_like, shape (n_source_samples, n_features)
+            Source domain array transformed after OT.
+
+        """
+
+        # avant transport
+        self._model.fit(self.Xs, self.ys, self.group_s)
+        y_pred_non_transport = self._model.predict(self.Xt_test)
+        oa_non_transport = accuracy_score(
+            self.yt_test, y_pred_non_transport)
+        print("Avant transport, l'OA obtenu est de", oa_non_transport)
+        # apres transport
+        self._model.fit(Xs_transform, self.ys, self.group_s)
+        y_pred_transport = self._model.predict(self.Xt_test)
+        oa_transport = accuracy_score(self.yt_test, y_pred_transport)
+        print("Après transport, l'OA obtenu est de", oa_transport)
+        print("Il y a une amélioration de",round(oa_transport-oa_non_transport,4),
+              "après transport")
+        
+    
+    def assess_transport(self, Xs_transform):
         """
         OA comparison before and after OT
 
@@ -229,51 +255,37 @@ class OptimalTransportGridSearch:
         ----------
         Xs_transform : array_like, shape (n_source_samples, n_features)
             Source domain array transformed after OT.
-        method: str
-            "test" or "all"
+
+        Returns
+        -------
+        y_pred_non_transport : array_like
+            yt_prediction before transport
+        y_pred_transport : array_like
+            yt_prediction after transport.
+
         """
-        if method == "test":
-            # avant transport
-            self._model.fit(self.Xs, self.ys, self.group_s)
-            y_pred_non_transport = self._model.predict(self.Xt_test)
-            oa_non_transport = accuracy_score(
-                self.yt_test, y_pred_non_transport)
-            print("Avant transport, l'OA obtenu est de", oa_non_transport)
-            # apres transport
-            self._model.fit(Xs_transform, self.ys, self.group_s)
-            y_pred_transport = self._model.predict(self.Xt_test)
-            oa_transport = accuracy_score(self.yt_test, y_pred_transport)
-            print("Après transport, l'OA obtenu est de", oa_transport)
-            print(
-                "Il y a une amélioration de",
-                round(
-                    oa_transport -
-                    oa_non_transport,
-                    4),
-                "après transport")
 
-        else:
-
-            # avant transport
-            self._model.fit(self.Xs, self.ys, self.group_s)
-            y_pred_non_transport = self._model.predict(self.Xt)
-            oa_non_transport = accuracy_score(self.yt, y_pred_non_transport)
-            print("Avant transport, l'OA obtenu est de", oa_non_transport)
-            # apres transport
-            self._model.fit(Xs_transform, self.ys, self.group_s)
-            y_pred_transport = self._model.predict(self.Xt)
-            oa_transport = accuracy_score(self.yt, y_pred_transport)
-            print(
-                "Après transport, l'OA obtenu est de",
-                oa_transport,
-                "sur toute l'image")
-            print(
-                "Il y a une amélioration de",
-                round(
-                    oa_transport -
-                    oa_non_transport,
-                    4),
-                "après transport (calcul sur toute l'image)")
+        # avant transport
+        self._model.fit(self.Xs, self.ys, self.group_s)
+        y_pred_non_transport = self._model.predict(self.Xt)
+        oa_non_transport = accuracy_score(self.yt, y_pred_non_transport)
+        print("Avant transport, l'OA obtenu est de", oa_non_transport)
+        # apres transport
+        self._model.fit(Xs_transform, self.ys, self.group_s)
+        y_pred_transport = self._model.predict(self.Xt)
+        oa_transport = accuracy_score(self.yt, y_pred_transport)
+        print(
+            "Après transport, l'OA obtenu est de",
+            oa_transport,
+            "sur toute l'image")
+        print(
+            "Il y a une amélioration de",
+            round(
+                oa_transport -
+                oa_non_transport,
+                4),
+            "après transport (calcul sur toute l'image)")
+        return y_pred_non_transport, y_pred_transport
 
     def _share_args(self, **params):
         """

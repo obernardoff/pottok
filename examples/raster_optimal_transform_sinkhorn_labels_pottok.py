@@ -23,7 +23,6 @@ black_pottok = black_pottok/255
 
 
 label = 'level' 
-group = 'level'
 
 
 
@@ -39,8 +38,6 @@ raster_transport_circular.preprocessing(in_image_source = source_image,
                    in_vector_target = target_vector,
                    in_label_source = label,
                    in_label_target = label,
-                   in_group_source = group,
-                   in_group_target = group,
                    scaler = StandardScaler)
 
 
@@ -89,8 +86,6 @@ raster_transport_crossed.preprocessing(in_image_source = source_image,
                    in_vector_target = target_vector,
                    in_label_source = label,
                    in_label_target = label,
-                   in_group_source = group,
-                   in_group_target = group,
                    scaler = StandardScaler)
 
 
