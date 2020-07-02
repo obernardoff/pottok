@@ -402,7 +402,10 @@ class OptimalTransportGridSearch:
             # modele de transport pour chaque combinaison de parametres
             transport_model_tmp = self.transport_function(**gridOT)
             # transport
-            transport_model_tmp.fit(Xs=Xs, ys=ys, Xt=Xt, yt=yt)
+            if self.transport_function == ot.da.SinkhornTransport : 
+                transport_model_tmp.fit(Xs=Xs, Xt=Xt)
+            else : 
+                transport_model_tmp.fit(Xs=Xs, ys=ys, Xt=Xt, yt=yt)
             Xs_transform = transport_model_tmp.transform(
                 Xs=Xs)  # transformation des Xs
             # apprentissage du nouveau modele sur Xs_transform
