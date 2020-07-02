@@ -286,6 +286,60 @@ class OptimalTransportGridSearch:
                 4),
             "après transport (calcul sur toute l'image)")
         return y_pred_non_transport, y_pred_transport
+    
+    
+    
+    
+    def assess_transport_circular(self, 
+                                  Xs_transform,
+                                  group_s=None,
+                                  group_t=None,
+                                  cv_ai=StratifiedKFold(
+                                      n_splits=2, shuffle=True, random_state=21),
+                                  classifier=RandomForestClassifier(),
+                                  parameters=dict(n_estimators=[100])):
+        """
+        OA comparison before and after OT
+
+        Parameters
+        ----------
+        Xs_transform : array_like, shape (n_source_samples, n_features)
+            Source domain array transformed after OT.
+
+        Returns
+        -------
+        y_pred_non_transport : array_like
+            yt_prediction before transport
+        y_pred_transport : array_like
+            yt_prediction after transport.
+
+        """
+        self.group_s = group_s
+        self.group_t = group_t
+        # avant transport
+        self._model = GridSearchCV(classifier, parameters, cv=cv_ai)
+        self._model.fit(self.Xs, self.ys, self.group_s)
+        y_pred_non_transport = self._model.predict(self.Xt)
+        oa_non_transport = accuracy_score(self.yt, y_pred_non_transport)
+        print("Avant transport, l'OA obtenu est de", oa_non_transport)
+        # apres transport
+        self._model.fit(Xs_transform, self.ys, self.group_s)
+        y_pred_transport = self._model.predict(self.Xt)
+        oa_transport = accuracy_score(self.yt, y_pred_transport)
+        print(
+            "Après transport, l'OA obtenu est de",
+            oa_transport,
+            "sur toute l'image")
+        print(
+            "Il y a une amélioration de",
+            round(
+                oa_transport -
+                oa_non_transport,
+                4),
+            "après transport (calcul sur toute l'image)")
+        return y_pred_non_transport, y_pred_transport
+    
+    
 
     def _share_args(self, **params):
         """
