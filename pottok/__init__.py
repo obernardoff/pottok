@@ -218,7 +218,8 @@ class OptimalTransportGridSearch:
 
         data = self.transport_model.transform(data)
         if self.scaler is not False:
-            data = self.Xs_scaler.inverse_transform(data)
+            data_non_scale = self.Xs_scaler.inverse_transform(data)
+            return data_non_scale,data
         return data
 
     def valid_fit_crossed(self, Xs_transform):
@@ -685,8 +686,9 @@ class RasterOptimalTransport(OptimalTransportGridSearch):
 
         data = self.transport_model.transform(data)
         if self.scaler is not False:
-            data = self.source_scaler.inverse_transform(data)
-        return data  
+            data_non_scale = self.source_scaler.inverse_transform(data)
+            return data_non_scale,data  
+        return data
 
           
             
