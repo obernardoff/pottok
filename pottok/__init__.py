@@ -238,12 +238,12 @@ class OptimalTransportGridSearch:
         y_pred_non_transport = self._model.predict(self.Xt_test)
         oa_non_transport = accuracy_score(
             self.yt_test, y_pred_non_transport)
-        print("Avant transport, l'OA obtenu est de", oa_non_transport)
+        print("Avant transport, l'OA obtenu est de", round(oa_non_transport,3))
         # apres transport
         self._model.fit(Xs_transform, self.ys, self.group_s)
         y_pred_transport = self._model.predict(self.Xt_test)
         oa_transport = accuracy_score(self.yt_test, y_pred_transport)
-        print("Après transport, l'OA obtenu est de", oa_transport)
+        print("Après transport, l'OA obtenu est de", round(oa_transport,3))
         print("Il y a une amélioration de",round(oa_transport-oa_non_transport,4),
               "après transport")
         
@@ -270,14 +270,14 @@ class OptimalTransportGridSearch:
         self._model.fit(self.Xs, self.ys, self.group_s)
         y_pred_non_transport = self._model.predict(self.Xt)
         oa_non_transport = accuracy_score(self.yt, y_pred_non_transport)
-        print("Avant transport, l'OA obtenu est de", oa_non_transport)
+        print("Avant transport, l'OA obtenu est de", round(oa_non_transport,3))
         # apres transport
         self._model.fit(Xs_transform, self.ys, self.group_s)
         y_pred_transport = self._model.predict(self.Xt)
         oa_transport = accuracy_score(self.yt, y_pred_transport)
         print(
             "Après transport, l'OA obtenu est de",
-            oa_transport,
+            round(oa_transport,3),
             "sur toute l'image")
         print(
             "Il y a une amélioration de",
@@ -322,14 +322,14 @@ class OptimalTransportGridSearch:
         self._model.fit(self.Xs, self.ys, self.group_s)
         y_pred_non_transport = self._model.predict(self.Xt)
         oa_non_transport = accuracy_score(self.yt, y_pred_non_transport)
-        print("Avant transport, l'OA obtenu est de", oa_non_transport)
+        print("Avant transport, l'OA obtenu est de", round(oa_non_transport,3))
         # apres transport
         self._model.fit(Xs_transform, self.ys, self.group_s)
         y_pred_transport = self._model.predict(self.Xt)
         oa_transport = accuracy_score(self.yt, y_pred_transport)
         print(
             "Après transport, l'OA obtenu est de",
-            oa_transport,
+            round(oa_transport,3),
             "sur toute l'image")
         print(
             "Il y a une amélioration de",
@@ -457,7 +457,7 @@ class OptimalTransportGridSearch:
             # modele de transport pour chaque combinaison de parametres
             transport_model_tmp = self.transport_function(**gridOT)
             # transport
-            if self.transport_function == ot.da.SinkhornTransport : 
+            if self.transport_function == ot.da.SinkhornTransport or self.transport_function == ot.da.EMDTransport :  
                 transport_model_tmp.fit(Xs=Xs, Xt=Xt)
             else : 
                 transport_model_tmp.fit(Xs=Xs, ys=ys, Xt=Xt, yt=yt)
@@ -465,10 +465,11 @@ class OptimalTransportGridSearch:
                 Xs=Xs)  # transformation des Xs
             # apprentissage du nouveau modele sur Xs_transform
             self._model.fit(Xs_transform, ys, group_val)
-            print('Accord global issu de la validation croisée : ' +
-                  str(self._model.best_score_))
-            print('Le meilleur paramètre est : ' +
-                  str(self._model.best_params_))
+            if self.verbose == True : 
+                print('Accord global issu de la validation croisée : ' +
+                      str(self._model.best_score_))
+                print('Le meilleur paramètre est : ' +
+                      str(self._model.best_params_))
             # prediction sur les Xt_valid
             yt_pred_valid = self._model.predict(self.Xt_valid)
             oa_transport = accuracy_score(self.yt_valid, yt_pred_valid)
@@ -486,6 +487,7 @@ class OptimalTransportGridSearch:
                   str(self.best_params))
             print('Best score is ' +
                   str(self.best_score))
+        print('Best grid is ' + str(self.best_params))
 
     def _find_best_parameters_circular(self, Xs, ys, Xt, yt):
         """
