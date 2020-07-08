@@ -31,7 +31,6 @@ import ot
 import museotoolbox as mtb
 import gdal
 
-
 __version__ = "0.1-rc1"
 
 
@@ -123,8 +122,9 @@ class OptimalTransportGridSearch:
                         n_splits=2, shuffle=True, random_state=21),
                     cv_ot=StratifiedKFold(
                         n_splits=2, shuffle=True, random_state=42),
-                    classifier=RandomForestClassifier(),
-                    parameters=dict(n_estimators=[100])):
+                    classifier=RandomForestClassifier(random_state=42),
+                    parameters=dict(n_estimators=[100]),
+                    yt_use=True):
         """
         Learn domain adaptation model with crossed tuning (fitting).
 
@@ -155,12 +155,13 @@ class OptimalTransportGridSearch:
             cv_ot=cv_ot,
             cv_ai=cv_ai,
             classifier=classifier,
-            parameters=parameters)
+            parameters=parameters,
+            yt_use=yt_use)
 
         if group_s is None:
 
             Xt_valid, Xt_test, yt_valid, yt_test = mtb.cross_validation.train_test_split(
-                cv=cv_ai, X=self.Xt, y=self.yt)
+                cv=cv_ot, X=self.Xt, y=self.yt)
             self._share_args(
                 Xt_valid=Xt_valid,
                 Xt_test=Xt_test,
@@ -298,7 +299,9 @@ class OptimalTransportGridSearch:
                                   cv_ai=StratifiedKFold(
                                       n_splits=2, shuffle=True, random_state=21),
                                   classifier=RandomForestClassifier(),
-                                  parameters=dict(n_estimators=[100])):
+                                  parameters=dict(n_estimators=[100]),
+                                  yt = None,
+                                  ys=None):
         """
         OA comparison before and after OT
 
@@ -317,6 +320,8 @@ class OptimalTransportGridSearch:
         """
         self.group_s = group_s
         self.group_t = group_t
+        self.yt=yt
+        self.ys=ys
         # avant transport
         self._model = GridSearchCV(classifier, parameters, cv=cv_ai)
         self._model.fit(self.Xs, self.ys, self.group_s)
@@ -459,6 +464,8 @@ class OptimalTransportGridSearch:
             # transport
             if self.transport_function == ot.da.SinkhornTransport or self.transport_function == ot.da.EMDTransport :  
                 transport_model_tmp.fit(Xs=Xs, Xt=Xt)
+            elif self.yt_use == False :
+                transport_model_tmp.fit(Xs=Xs, Xt=Xt, ys=ys)
             else : 
                 transport_model_tmp.fit(Xs=Xs, ys=ys, Xt=Xt, yt=yt)
             Xs_transform = transport_model_tmp.transform(
@@ -649,7 +656,7 @@ class RasterOptimalTransport(OptimalTransportGridSearch):
             
         target_array = mtb.processing.RasterMath(in_image_target,return_3d=False,
                                           verbose=False).get_image_as_array()
-
+        
         
         if self._need_scale : 
 
