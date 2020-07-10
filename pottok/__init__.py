@@ -63,6 +63,8 @@ class OptimalTransportGridSearch:
                       ys=None,
                       Xt=None,
                       yt=None,
+                      group_s=None,
+                      group_t=None,
                       scaler=False):
         """
         Stock the input parameters in the object and scaled it if it is asked.
@@ -81,10 +83,11 @@ class OptimalTransportGridSearch:
             The function used to scale Xs and Xt
         """
 
-        self._share_args(Xs=Xs, ys=ys, Xt=Xt, yt=yt, scaler=scaler)
+        self._share_args(Xs=Xs, ys=ys, Xt=Xt, yt=yt, group_s=group_s, group_t=group_t, scaler=scaler)
         self._prefit(Xs, Xt)
 
-    def fit_circular(self, metrics=mean_squared_error,
+    def fit_circular(self,
+                     metrics=mean_squared_error,
                      greater_is_better=False):
         """
         Learn domain adaptation model with circular tuning (fitting).
@@ -116,12 +119,8 @@ class OptimalTransportGridSearch:
         return self.transport_model
 
     def fit_crossed(self,
-                    group_s=None,
-                    group_t=None,
-                    cv_ai=StratifiedKFold(
-                        n_splits=2, shuffle=True, random_state=21),
-                    cv_ot=StratifiedKFold(
-                        n_splits=2, shuffle=True, random_state=42),
+                    cv_ai=StratifiedKFold(n_splits=2, shuffle=True, random_state=21),
+                    cv_ot=StratifiedKFold(n_splits=2, shuffle=True, random_state=42),
                     classifier=RandomForestClassifier(random_state=42),
                     parameters=dict(n_estimators=[100]),
                     yt_use=True):
@@ -150,15 +149,13 @@ class OptimalTransportGridSearch:
         """
 
         self._share_args(
-            group_s=group_s,
-            group_t=group_t,
             cv_ot=cv_ot,
             cv_ai=cv_ai,
             classifier=classifier,
             parameters=parameters,
             yt_use=yt_use)
 
-        if group_s is None:
+        if self.group_s is None:
 
             Xt_valid, Xt_test, yt_valid, yt_test = mtb.cross_validation.train_test_split(
                 cv=cv_ot, X=self.Xt, y=self.yt)
@@ -181,18 +178,15 @@ class OptimalTransportGridSearch:
 
         # model with input parameters
         self._model = GridSearchCV(classifier, parameters, cv=cv_ai)
-        
-        if self._is_grid_search():
 
-            self._find_best_parameters_crossed(
-                self.Xs, ys=self.ys, Xt=self.Xt, yt=self.yt, group_val=self.group_s)
+
+        if self.params_ot is None:
+            self.transport_model = self.transport_function()
+            self.transport_model.fit(self.Xs, ys=self.ys, Xt=self.Xt, yt=self.yt)
 
         else:
-            # init transport model
-            self.transport_model = self.transport_function()
-            # simply train with basic param
-            self.transport_model.fit(
-                self.Xs, ys=self.ys, Xt=self.Xt, yt=self.yt)
+            self._find_best_parameters_crossed(
+                self.Xs, ys=self.ys, Xt=self.Xt, yt=self.yt, group_val=self.group_s)
 
         return self.transport_model
 
@@ -219,12 +213,12 @@ class OptimalTransportGridSearch:
         if self.scaler is not False:
             data_non_scale = self.Xs_scaler.inverse_transform(data)
             return data_non_scale,data #non scale, scale
-        else : 
+        else :
             return data #non scale
 
     def valid_fit_crossed(self, Xs_transform):
         """
-        OA comparison before and after OT with Xt_test 
+        OA comparison before and after OT with Xt_test
 
         Parameters
         ----------
@@ -246,8 +240,8 @@ class OptimalTransportGridSearch:
         print("Après transport, l'OA obtenu est de", round(oa_transport,3))
         print("Il y a une amélioration de",round(oa_transport-oa_non_transport,4),
               "après transport")
-        
-    
+
+
     def assess_transport(self, Xs_transform):
         """
         OA comparison before and after OT
@@ -287,11 +281,11 @@ class OptimalTransportGridSearch:
                 4),
             "après transport (calcul sur toute l'image)")
         return y_pred_non_transport, y_pred_transport
-    
-    
-    
-    
-    def assess_transport_circular(self, 
+
+
+
+
+    def assess_transport_circular(self,
                                   Xs_transform,
                                   group_s=None,
                                   group_t=None,
@@ -343,8 +337,8 @@ class OptimalTransportGridSearch:
                 4),
             "après transport (calcul sur toute l'image)")
         return y_pred_non_transport, y_pred_transport
-    
-    
+
+
 
     def _share_args(self, **params):
         """
@@ -462,17 +456,17 @@ class OptimalTransportGridSearch:
             # modele de transport pour chaque combinaison de parametres
             transport_model_tmp = self.transport_function(**gridOT)
             # transport
-            if self.transport_function == ot.da.SinkhornTransport or self.transport_function == ot.da.EMDTransport :  
+            if self.transport_function == ot.da.SinkhornTransport or self.transport_function == ot.da.EMDTransport :
                 transport_model_tmp.fit(Xs=Xs, Xt=Xt)
             elif self.yt_use == False :
                 transport_model_tmp.fit(Xs=Xs, Xt=Xt, ys=ys)
-            else : 
+            else :
                 transport_model_tmp.fit(Xs=Xs, ys=ys, Xt=Xt, yt=yt)
             Xs_transform = transport_model_tmp.transform(
                 Xs=Xs)  # transformation des Xs
             # apprentissage du nouveau modele sur Xs_transform
             self._model.fit(Xs_transform, ys, group_val)
-            if self.verbose == True : 
+            if self.verbose == True :
                 print('Accord global issu de la validation croisée : ' +
                       str(self._model.best_score_))
                 print('Le meilleur paramètre est : ' +
@@ -562,8 +556,8 @@ class RasterOptimalTransport(OptimalTransportGridSearch):
         """
         super().__init__(transport_function, params, verbose)
 
-            
-            
+
+
     def preprocessing(self,
                       in_image_source=None,
                       in_image_target=None,
@@ -597,7 +591,7 @@ class RasterOptimalTransport(OptimalTransportGridSearch):
             name of the group colum of each polygon in vector file (target)
         scaler: scale function (default=StandardScaler)
             The function used to scale source and target image
-            
+
         """
 
         self._share_args(in_image_source=in_image_source,
@@ -609,73 +603,73 @@ class RasterOptimalTransport(OptimalTransportGridSearch):
                          in_group_source=in_group_source,
                          in_group_target=in_group_target,
                          scaler=scaler)
-        
-        
+
+
         if self.in_group_source is None :
-            
-            
+
+
             Xs, ys = mtb.processing.extract_ROI(self.in_image_source,
                                                 self.in_vector_source,
                                                 self.in_label_source)  # Xsource ysource
-    
+
             Xt, yt = mtb.processing.extract_ROI(self.in_image_target,
                                                 self.in_vector_target,
                                                 self.in_label_target)  # Xsource ysource
-    
-            
+
+
             self.Xs = Xs
             self.Xt = Xt
             self.ys = ys
-            self.yt = yt        
-        
-        else : 
-            
-        
+            self.yt = yt
+
+        else :
+
+
             Xs, ys, group_s = mtb.processing.extract_ROI(self.in_image_source,
                                                                 self.in_vector_source,
                                                                 self.in_label_source,
                                                                 self.in_group_source)  # Xsource ysource
-    
+
             Xt, yt, group_t= mtb.processing.extract_ROI(self.in_image_target,
                                                                 self.in_vector_target,
                                                                 self.in_label_target,
                                                                 self.in_group_target)  # Xsource ysource
-    
-            
+
+
             self.Xs = Xs
             self.Xt = Xt
             self.ys = ys
-            self.yt = yt        
+            self.yt = yt
             self.group_s = group_s
-            self.group_t = group_t 
-            
-            
-            
+            self.group_t = group_t
+
+
+
         source_array = mtb.processing.RasterMath(in_image_source,return_3d=False,
                                           verbose=False).get_image_as_array()
-            
+
         target_array = mtb.processing.RasterMath(in_image_target,return_3d=False,
                                           verbose=False).get_image_as_array()
-        
-        
-        if self._need_scale : 
+
+
+        if self._need_scale :
 
             self.Xs_non_scaled = Xs
             self.Xt_non_scaled = Xt
             self._prefit_image(source_array,target_array)
             self.Xs = self.source_scaler.transform(self.Xs_non_scaled)
             self.Xt = self.target_scaler.transform(self.Xt_non_scaled)
-            print("Image is scaled") 
-            
-        else : 
-            
+            print("Image is scaled")
+
+        else :
+
             self.source = source_array.astype(float)
-            self.target = target_array.astype(float)        
+            self.target = target_array.astype(float)
             self.Xs = self.Xs.astype(float)
             self.Xt = self.Xt.astype(float)
 
             print("Image is not scaled")
-        
+
 
     def predict_transfer(self, data):
         """
@@ -696,11 +690,12 @@ class RasterOptimalTransport(OptimalTransportGridSearch):
         data = self.transport_model.transform(data)
         if self.scaler is not False:
             data_non_scale = self.source_scaler.inverse_transform(data)
-            return data_non_scale,data  
-        return data
+            return data_non_scale,data
+        else :
+            return data
 
-          
-            
+
+
     def _prefit_image(self, source, target):
         """
         Scale source and target
