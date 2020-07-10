@@ -182,19 +182,21 @@ class OptimalTransportGridSearch:
         self._model = GridSearchCV(classifier, parameters, cv=cv_ai)
         # save
 
-        if self.params_ot is None:
-            self.transport_model = self.transport_function()
+        # if self.params_ot is None:
+        #     self.transport_model = self.transport_function()
+        # else:
+        # if grid search
+        if self._is_grid_search():
+
+            self._find_best_parameters_crossed(
+                self.Xs, ys=self.ys, Xt=self.Xt, yt=self.yt, group_val=self.group_s)
+
         else:
-            # if grid search
-            if self._is_grid_search():
-
-                self._find_best_parameters_crossed(
-                    self.Xs, ys=self.ys, Xt=self.Xt, yt=self.yt, group_val=self.group_s)
-
-            else:
-                # simply train with basic param
-                self.transport_model.fit(
-                    self.Xs, ys=self.ys, Xt=self.Xt, yt=self.yt)
+            # init transport model
+            self.transport_model = self.transport_function()
+            # simply train with basic param
+            self.transport_model.fit(
+                self.Xs, ys=self.ys, Xt=self.Xt, yt=self.yt)
 
         return self.transport_model
 
@@ -216,7 +218,7 @@ class OptimalTransportGridSearch:
         if self.scaler is not False:
             data = self.Xs_scaler.transform(data)
 
-        data = self.transport_model.transform(data)
+        data = self.transport_model.transform(Xs=data)
         if self.scaler is not False:
             data_non_scale = self.Xs_scaler.inverse_transform(data)
             return data_non_scale,data
@@ -406,9 +408,10 @@ class OptimalTransportGridSearch:
     def _is_grid_search(self):
         # search for gridSearch
         param_grid = []
-        for key in self.params_ot.keys():
-            if isinstance(self.params_ot.get(key), (list, np.ndarray)):
-                param_grid.append(key)
+        if self.params_ot is not None:
+            for key in self.params_ot.keys():
+                if isinstance(self.params_ot.get(key), (list, np.ndarray)):
+                    param_grid.append(key)
 
         if param_grid == []:
             self.param_grid = False

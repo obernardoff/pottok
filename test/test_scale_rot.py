@@ -10,18 +10,14 @@ import pottok
 import museotoolbox as mtb
 from sklearn.preprocessing import StandardScaler  # centrer-réduire
 
-
-
 source_image,source_vector,target_image,target_vector = pottok.datasets.load_pottoks(return_only_path = True)
 
 brown_pottok,black_pottok = pottok.datasets.load_pottoks(return_X_y=False)
 brown_pottok = brown_pottok/255
 black_pottok = black_pottok/255
 
-
 label = 'level' 
 group = 'level'
-
 
 class TestPottokScale(unittest.TestCase):
     def test_scaler(self):
