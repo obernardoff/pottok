@@ -208,10 +208,11 @@ class OptimalTransportGridSearch:
         data : arr.
             Vector to transfer
 
-        Return
-        ----------
-        transport : arr
-            tranfered vector
+        Returns
+        -------
+        data or data_non_scale : arr
+            tranfered vector scaled or not scaled
+
         """
 
         if self.scaler is not False:
@@ -220,8 +221,9 @@ class OptimalTransportGridSearch:
         data = self.transport_model.transform(data)
         if self.scaler is not False:
             data_non_scale = self.Xs_scaler.inverse_transform(data)
-            return data_non_scale,data
-        return data
+            return data_non_scale,data #non scale, scale
+        else : 
+            return data #non scale
 
     def valid_fit_crossed(self, Xs_transform):
         """
