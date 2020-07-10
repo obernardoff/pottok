@@ -181,12 +181,7 @@ class OptimalTransportGridSearch:
 
         # model with input parameters
         self._model = GridSearchCV(classifier, parameters, cv=cv_ai)
-        # save
-
-        # if self.params_ot is None:
-        #     self.transport_model = self.transport_function()
-        # else:
-        # if grid search
+        
         if self._is_grid_search():
 
             self._find_best_parameters_crossed(
