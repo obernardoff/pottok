@@ -178,16 +178,17 @@ class OptimalTransportGridSearch:
 
         # model with input parameters
         self._model = GridSearchCV(classifier, parameters, cv=cv_ai)
-
+        
+        
 
         if self.params_ot is None:
             self.transport_model = self.transport_function()
             self.transport_model.fit(self.Xs, ys=self.ys, Xt=self.Xt, yt=self.yt)
 
-        else:
+        elif self._is_grid_search():
             self._find_best_parameters_crossed(
                 self.Xs, ys=self.ys, Xt=self.Xt, yt=self.yt, group_val=self.group_s)
-
+        
         return self.transport_model
 
     def predict_transfer(self, data):
@@ -403,18 +404,19 @@ class OptimalTransportGridSearch:
 
     def _is_grid_search(self):
         # search for gridSearch
-        param_grid = []
+        
         if self.params_ot is not None:
+            param_grid = []
             for key in self.params_ot.keys():
                 if isinstance(self.params_ot.get(key), (list, np.ndarray)):
                     param_grid.append(key)
-
-        if param_grid == []:
-            self.param_grid = False
-        else:
+            
             self.param_grid = param_grid
             self.params_ot = self.params_ot.copy()
 
+        else :
+            self.param_grid = False
+        
         if self.param_grid:
             return True
         else:
@@ -506,7 +508,7 @@ class OptimalTransportGridSearch:
             Label target array (1d).
         """
         self.best_score = None
-
+        
         for gridOT in self._generate_params_from_grid_search():
             transport_model_tmp = self.transport_function(**gridOT)
             transport_model_tmp.fit(Xs=Xs, ys=ys, Xt=Xt, yt=yt)
