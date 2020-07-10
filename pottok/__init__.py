@@ -31,7 +31,6 @@ import ot
 import museotoolbox as mtb
 import gdal
 
-
 __version__ = "0.1-rc1"
 
 
@@ -123,8 +122,9 @@ class OptimalTransportGridSearch:
                         n_splits=2, shuffle=True, random_state=21),
                     cv_ot=StratifiedKFold(
                         n_splits=2, shuffle=True, random_state=42),
-                    classifier=RandomForestClassifier(),
-                    parameters=dict(n_estimators=[100])):
+                    classifier=RandomForestClassifier(random_state=42),
+                    parameters=dict(n_estimators=[100]),
+                    yt_use=True):
         """
         Learn domain adaptation model with crossed tuning (fitting).
 
@@ -155,12 +155,13 @@ class OptimalTransportGridSearch:
             cv_ot=cv_ot,
             cv_ai=cv_ai,
             classifier=classifier,
-            parameters=parameters)
+            parameters=parameters,
+            yt_use=yt_use)
 
         if group_s is None:
 
             Xt_valid, Xt_test, yt_valid, yt_test = mtb.cross_validation.train_test_split(
-                cv=cv_ai, X=self.Xt, y=self.yt)
+                cv=cv_ot, X=self.Xt, y=self.yt)
             self._share_args(
                 Xt_valid=Xt_valid,
                 Xt_test=Xt_test,
@@ -209,10 +210,11 @@ class OptimalTransportGridSearch:
         data : arr.
             Vector to transfer
 
-        Return
-        ----------
-        transport : arr
-            tranfered vector
+        Returns
+        -------
+        data or data_non_scale : arr
+            tranfered vector scaled or not scaled
+
         """
 
         if self.scaler is not False:
@@ -221,8 +223,9 @@ class OptimalTransportGridSearch:
         data = self.transport_model.transform(Xs=data)
         if self.scaler is not False:
             data_non_scale = self.Xs_scaler.inverse_transform(data)
-            return data_non_scale,data
-        return data
+            return data_non_scale,data #non scale, scale
+        else : 
+            return data #non scale
 
     def valid_fit_crossed(self, Xs_transform):
         """
@@ -240,12 +243,12 @@ class OptimalTransportGridSearch:
         y_pred_non_transport = self._model.predict(self.Xt_test)
         oa_non_transport = accuracy_score(
             self.yt_test, y_pred_non_transport)
-        print("Avant transport, l'OA obtenu est de", oa_non_transport)
+        print("Avant transport, l'OA obtenu est de", round(oa_non_transport,3))
         # apres transport
         self._model.fit(Xs_transform, self.ys, self.group_s)
         y_pred_transport = self._model.predict(self.Xt_test)
         oa_transport = accuracy_score(self.yt_test, y_pred_transport)
-        print("Après transport, l'OA obtenu est de", oa_transport)
+        print("Après transport, l'OA obtenu est de", round(oa_transport,3))
         print("Il y a une amélioration de",round(oa_transport-oa_non_transport,4),
               "après transport")
         
@@ -272,14 +275,14 @@ class OptimalTransportGridSearch:
         self._model.fit(self.Xs, self.ys, self.group_s)
         y_pred_non_transport = self._model.predict(self.Xt)
         oa_non_transport = accuracy_score(self.yt, y_pred_non_transport)
-        print("Avant transport, l'OA obtenu est de", oa_non_transport)
+        print("Avant transport, l'OA obtenu est de", round(oa_non_transport,3))
         # apres transport
         self._model.fit(Xs_transform, self.ys, self.group_s)
         y_pred_transport = self._model.predict(self.Xt)
         oa_transport = accuracy_score(self.yt, y_pred_transport)
         print(
             "Après transport, l'OA obtenu est de",
-            oa_transport,
+            round(oa_transport,3),
             "sur toute l'image")
         print(
             "Il y a une amélioration de",
@@ -300,7 +303,9 @@ class OptimalTransportGridSearch:
                                   cv_ai=StratifiedKFold(
                                       n_splits=2, shuffle=True, random_state=21),
                                   classifier=RandomForestClassifier(),
-                                  parameters=dict(n_estimators=[100])):
+                                  parameters=dict(n_estimators=[100]),
+                                  yt = None,
+                                  ys=None):
         """
         OA comparison before and after OT
 
@@ -319,19 +324,21 @@ class OptimalTransportGridSearch:
         """
         self.group_s = group_s
         self.group_t = group_t
+        self.yt=yt
+        self.ys=ys
         # avant transport
         self._model = GridSearchCV(classifier, parameters, cv=cv_ai)
         self._model.fit(self.Xs, self.ys, self.group_s)
         y_pred_non_transport = self._model.predict(self.Xt)
         oa_non_transport = accuracy_score(self.yt, y_pred_non_transport)
-        print("Avant transport, l'OA obtenu est de", oa_non_transport)
+        print("Avant transport, l'OA obtenu est de", round(oa_non_transport,3))
         # apres transport
         self._model.fit(Xs_transform, self.ys, self.group_s)
         y_pred_transport = self._model.predict(self.Xt)
         oa_transport = accuracy_score(self.yt, y_pred_transport)
         print(
             "Après transport, l'OA obtenu est de",
-            oa_transport,
+            round(oa_transport,3),
             "sur toute l'image")
         print(
             "Il y a une amélioration de",
@@ -460,18 +467,21 @@ class OptimalTransportGridSearch:
             # modele de transport pour chaque combinaison de parametres
             transport_model_tmp = self.transport_function(**gridOT)
             # transport
-            if self.transport_function == ot.da.SinkhornTransport : 
+            if self.transport_function == ot.da.SinkhornTransport or self.transport_function == ot.da.EMDTransport :  
                 transport_model_tmp.fit(Xs=Xs, Xt=Xt)
+            elif self.yt_use == False :
+                transport_model_tmp.fit(Xs=Xs, Xt=Xt, ys=ys)
             else : 
                 transport_model_tmp.fit(Xs=Xs, ys=ys, Xt=Xt, yt=yt)
             Xs_transform = transport_model_tmp.transform(
                 Xs=Xs)  # transformation des Xs
             # apprentissage du nouveau modele sur Xs_transform
             self._model.fit(Xs_transform, ys, group_val)
-            print('Accord global issu de la validation croisée : ' +
-                  str(self._model.best_score_))
-            print('Le meilleur paramètre est : ' +
-                  str(self._model.best_params_))
+            if self.verbose == True : 
+                print('Accord global issu de la validation croisée : ' +
+                      str(self._model.best_score_))
+                print('Le meilleur paramètre est : ' +
+                      str(self._model.best_params_))
             # prediction sur les Xt_valid
             yt_pred_valid = self._model.predict(self.Xt_valid)
             oa_transport = accuracy_score(self.yt_valid, yt_pred_valid)
@@ -489,6 +499,7 @@ class OptimalTransportGridSearch:
                   str(self.best_params))
             print('Best score is ' +
                   str(self.best_score))
+        print('Best grid is ' + str(self.best_params))
 
     def _find_best_parameters_circular(self, Xs, ys, Xt, yt):
         """
@@ -650,7 +661,7 @@ class RasterOptimalTransport(OptimalTransportGridSearch):
             
         target_array = mtb.processing.RasterMath(in_image_target,return_3d=False,
                                           verbose=False).get_image_as_array()
-
+        
         
         if self._need_scale : 
 
