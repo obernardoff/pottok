@@ -62,7 +62,9 @@ class OptimalTransportGridSearch:
                       Xs,
                       ys=None,
                       Xt=None,
-                      yt=None,
+                      yt=None,                     
+                      group_s=None,
+                      group_t=None,
                       scaler=False):
         """
         Stock the input parameters in the object and scaled it if it is asked.
@@ -81,10 +83,11 @@ class OptimalTransportGridSearch:
             The function used to scale Xs and Xt
         """
 
-        self._share_args(Xs=Xs, ys=ys, Xt=Xt, yt=yt, scaler=scaler)
+        self._share_args(Xs=Xs, ys=ys, Xt=Xt, yt=yt, group_s=group_s, group_t=group_t, scaler=scaler)
         self._prefit(Xs, Xt)
 
-    def fit_circular(self, metrics=mean_squared_error,
+    def fit_circular(self, 
+                     metrics=mean_squared_error,
                      greater_is_better=False):
         """
         Learn domain adaptation model with circular tuning (fitting).
@@ -116,12 +119,8 @@ class OptimalTransportGridSearch:
         return self.transport_model
 
     def fit_crossed(self,
-                    group_s=None,
-                    group_t=None,
-                    cv_ai=StratifiedKFold(
-                        n_splits=2, shuffle=True, random_state=21),
-                    cv_ot=StratifiedKFold(
-                        n_splits=2, shuffle=True, random_state=42),
+                    cv_ai=StratifiedKFold(n_splits=2, shuffle=True, random_state=21),
+                    cv_ot=StratifiedKFold(n_splits=2, shuffle=True, random_state=42),
                     classifier=RandomForestClassifier(random_state=42),
                     parameters=dict(n_estimators=[100]),
                     yt_use=True):
@@ -150,15 +149,13 @@ class OptimalTransportGridSearch:
         """
 
         self._share_args(
-            group_s=group_s,
-            group_t=group_t,
             cv_ot=cv_ot,
             cv_ai=cv_ai,
             classifier=classifier,
             parameters=parameters,
             yt_use=yt_use)
 
-        if group_s is None:
+        if self.group_s is None:
 
             Xt_valid, Xt_test, yt_valid, yt_test = mtb.cross_validation.train_test_split(
                 cv=cv_ot, X=self.Xt, y=self.yt)
@@ -185,6 +182,7 @@ class OptimalTransportGridSearch:
 
         if self.params_ot is None:
             self.transport_model = self.transport_function()
+            self.transport_model.fit(self.Xs, ys=self.ys, Xt=self.Xt, yt=self.yt)           
         else:
             # if grid search
             if self._is_grid_search():
@@ -698,8 +696,9 @@ class RasterOptimalTransport(OptimalTransportGridSearch):
         data = self.transport_model.transform(data)
         if self.scaler is not False:
             data_non_scale = self.source_scaler.inverse_transform(data)
-            return data_non_scale,data  
-        return data
+            return data_non_scale,data 
+        else : 
+            return data
 
           
             
