@@ -18,8 +18,11 @@ from sklearn.preprocessing import StandardScaler
 # warnings.filterwarnings("ignore")
 #################################
 
-wdir = "/home/olivia/Bureau/StageDynafor/donnees/decoupe/"
-
+import os
+if os.uname()[1] == 'kali':
+    wdir = "/mnt/bigone/cours/Stage/2020/olivia/data/s2/"
+else:
+    wdir = "/home/olivia/Bureau/StageDynafor/donnees/decoupe/"
 #image entière
 source_image = wdir+'SITS_2019_crop_decoupe.tif'
 target_image = wdir+'SITS_2017_crop_decoupe.tif' 
@@ -40,8 +43,6 @@ group_label = 'rowid_BD'
 # -----------------------------------------------------
 
 
-
-
 print('---------------------------------------------------------')
 print("ROT : régularisé entropie - Sinkhorn entropie")
 
@@ -53,19 +54,22 @@ rot.preprocessing(in_image_source=source_image,
                       in_image_target=target_image,
                       in_vector_source=labels,
                       in_vector_target=labels,
-                      in_label_source=level2,
-                      in_label_target=level2,
+                      in_label_source=level3,
+                      in_label_target=level3,
                       in_group_source=group_label,
                       in_group_target=group_label,
                       scaler=False)
 
 
-rot.fit_crossed()
+# rot.fit_crossed()
+rot.fit_circular()
 rot_Xst = rot.predict_transfer(rot.Xs)
 
-yt_no_trans_rot, yt_transp_rot = rot.assess_transport(rot_Xst)
+# yt_no_trans_rot, yt_transp_rot = rot.assess_transport(rot_Xst)
+yt_no_trans_rot, yt_transp_rot = rot.assess_transport_circular(rot_Xst, ys = rot.ys, yt = rot.yt)
 
 yt_rot = rot.yt
+
 print('---------------------------------------------------------')
 print('yt predit SANS transport', '\n', 'Nombre de True : ', sum(yt_rot == yt_no_trans_rot),"/",len(yt_rot))
 print('---------------------------------------------------------')

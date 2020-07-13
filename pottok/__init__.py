@@ -58,6 +58,17 @@ class OptimalTransportGridSearch:
         self.params_ot = params
         self.verbose = verbose
 
+    def _convert_to_float64(self,array):
+        """
+        If array is integer, convert to float64.
+        In any case, return array !
+        """
+        
+        if np.issubdtype(array.dtype, np.integer):
+            array = array.astype(np.float64)
+        
+        return array
+        
     def preprocessing(self,
                       Xs,
                       ys=None,
@@ -83,7 +94,7 @@ class OptimalTransportGridSearch:
             The function used to scale Xs and Xt
         """
 
-        self._share_args(Xs=Xs, ys=ys, Xt=Xt, yt=yt, group_s=group_s, group_t=group_t, scaler=scaler)
+        self._share_args(Xs=self._convert_to_float64(Xs), ys=ys, Xt=self._convert_to_float64(Xt), yt=yt, group_s=group_s, group_t=group_t, scaler=scaler)
         self._prefit(Xs, Xt)
 
     def fit_circular(self,
@@ -107,7 +118,8 @@ class OptimalTransportGridSearch:
         """
         self.metrics = metrics
         self.greater_is_better = greater_is_better
-
+        
+        print(self.Xs)
         if self._is_grid_search():
             self._find_best_parameters_circular(
                 self.Xs, ys=self.ys, Xt=self.Xt, yt=self.yt)
@@ -137,7 +149,7 @@ class OptimalTransportGridSearch:
             cv used for the classifier learning.
             Allowed function from museotoolbox as scikit-learn.
         cv_ot: cross-validation function
-            cv used for the train_test_split.
+            cv used for the tratest_split.
             Allowed function from museotoolbox as scikit-learn.
         classifier: training algorithm (default=RandomForestClassifier)
 
@@ -157,7 +169,7 @@ class OptimalTransportGridSearch:
 
         if self.group_s is None:
 
-            Xt_valid, Xt_test, yt_valid, yt_test = mtb.cross_validation.train_test_split(
+            Xt_valid, Xt_test, yt_valid, yt_test = mtb.cross_validation.tratest_split(
                 cv=cv_ot, X=self.Xt, y=self.yt)
             self._share_args(
                 Xt_valid=Xt_valid,
@@ -166,7 +178,7 @@ class OptimalTransportGridSearch:
                 yt_test=yt_test)
         else:
 
-            Xt_valid, Xt_test, yt_valid, yt_test, groupt_valid, groupt_test = mtb.cross_validation.train_test_split(
+            Xt_valid, Xt_test, yt_valid, yt_test, groupt_valid, groupt_test = mtb.cross_validation.tratest_split(
                 cv=cv_ai, X=self.Xt, y=self.yt, groups=self.group_t)
             self._share_args(
                 Xt_valid=Xt_valid,
@@ -281,6 +293,7 @@ class OptimalTransportGridSearch:
                 oa_non_transport,
                 4),
             "après transport (calcul sur toute l'image)")
+        
         return y_pred_non_transport, y_pred_transport
 
 
@@ -561,96 +574,83 @@ class RasterOptimalTransport(OptimalTransportGridSearch):
 
 
     def preprocessing(self,
-                      in_image_source=None,
-                      in_image_target=None,
-                      in_vector_source=None,
-                      in_vector_target=None,
-                      in_label_source=None,
-                      in_label_target=None,
-                      in_group_source=None,
-                      in_group_target=None,
+                      image_source=None,
+                      image_target=None,
+                      vector_source=None,
+                      vector_target=None,
+                      label_source=None,
+                      label_target=None,
+                      group_source=None,
+                      group_target=None,
                       scaler=StandardScaler):
         """
         Scale all image (if it is asked) and stock the input parameters in the object .
 
         Parameters
         -----------
-        in_image_source : str.
+        image_source : str.
             source image (gdal supported raster) -> path + file name
-        in_image_target : str.
+        image_target : str.
             target image (gdal supported raster) -> path + file name
-        in_vector_source : str.
+        vector_source : str.
             labels (gdal supported vector) -> path + file name
-        in_vector_target : str.
+        vector_target : str.
             labels (gdal supported vectorR) -> path + file name
-        in_label_source : str.
+        label_source : str.
             name of the label colum in vector file (source)
-        in_label_source : str.
+        label_source : str.
             name of the label colum in vector file (target)
-        in_group_source : str.
+        group_source : str.
             name of the group colum of each polygon in vector file (source)
-        in_group_target : str.
+        group_target : str.
             name of the group colum of each polygon in vector file (target)
         scaler: scale function (default=StandardScaler)
             The function used to scale source and target image
 
         """
 
-        self._share_args(in_image_source=in_image_source,
-                         in_image_target=in_image_target,
-                         in_vector_source=in_vector_source,
-                         in_vector_target=in_vector_target,
-                         in_label_source=in_label_source,
-                         in_label_target=in_label_target,
-                         in_group_source=in_group_source,
-                         in_group_target=in_group_target,
+        self._share_args(image_source=image_source,
+                         image_target=image_target,
+                         vector_source=vector_source,
+                         vector_target=vector_target,
+                         label_source=label_source,
+                         label_target=label_target,
+                         group_source=group_source,
+                         group_target=group_target,
                          scaler=scaler)
 
 
-        if self.in_group_source is None :
+        if self.group_source is None :
 
 
-            Xs, ys = mtb.processing.extract_ROI(self.in_image_source,
-                                                self.in_vector_source,
-                                                self.in_label_source)  # Xsource ysource
+            Xs, ys = mtb.processing.extract_ROI(self.image_source,
+                                                self.vector_source,
+                                                self.label_source)  # Xsource ysource
 
-            Xt, yt = mtb.processing.extract_ROI(self.in_image_target,
-                                                self.in_vector_target,
-                                                self.in_label_target)  # Xsource ysource
+            Xt, yt = mtb.processing.extract_ROI(self.image_target,
+                                                self.vector_target,
+                                                self.label_target)  # Xsource ysource
 
-
-            self.Xs = Xs
-            self.Xt = Xt
-            self.ys = ys
-            self.yt = yt
-
+            group_s, group_t = None,None
         else :
 
 
-            Xs, ys, group_s = mtb.processing.extract_ROI(self.in_image_source,
-                                                                self.in_vector_source,
-                                                                self.in_label_source,
-                                                                self.in_group_source)  # Xsource ysource
+            Xs, ys, group_s = mtb.processing.extract_ROI(self.image_source,
+                                                                self.vector_source,
+                                                                self.label_source,
+                                                                self.group_source)  # Xsource ysource
 
-            Xt, yt, group_t= mtb.processing.extract_ROI(self.in_image_target,
-                                                                self.in_vector_target,
-                                                                self.in_label_target,
-                                                                self.in_group_target)  # Xsource ysource
+            Xt, yt, group_t= mtb.processing.extract_ROI(self.image_target,
+                                                                self.vector_target,
+                                                                self.label_target,
+                                                                self.group_target)  # Xsource ysource
+            
+        self._share_args(Xs = self._convert_to_float64(Xs), Xt = self._convert_to_float64(Xt), ys = ys, yt = yt, group_s = group_s, group_t = group_t)
 
-
-            self.Xs = Xs
-            self.Xt = Xt
-            self.ys = ys
-            self.yt = yt
-            self.group_s = group_s
-            self.group_t = group_t
-
-
-
-        source_array = mtb.processing.RasterMath(in_image_source,return_3d=False,
+        source_array = mtb.processing.RasterMath(image_source,return_3d=False,
                                           verbose=False).get_image_as_array()
 
-        target_array = mtb.processing.RasterMath(in_image_target,return_3d=False,
+        target_array = mtb.processing.RasterMath(image_target,return_3d=False,
                                           verbose=False).get_image_as_array()
 
 
@@ -665,10 +665,8 @@ class RasterOptimalTransport(OptimalTransportGridSearch):
 
         else :
 
-            self.source = source_array.astype(float)
-            self.target = target_array.astype(float)
-            self.Xs = self.Xs.astype(float)
-            self.Xt = self.Xt.astype(float)
+            self.source = source_array.astype(np.float64)
+            self.target = target_array.astype(np.float64)
 
             print("Image is not scaled")
 
