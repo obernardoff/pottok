@@ -169,7 +169,7 @@ class OptimalTransportGridSearch:
 
         if self.group_s is None:
 
-            Xt_valid, Xt_test, yt_valid, yt_test = mtb.cross_validation.tratest_split(
+            Xt_valid, Xt_test, yt_valid, yt_test = mtb.cross_validation.train_test_split(
                 cv=cv_ot, X=self.Xt, y=self.yt)
             self._share_args(
                 Xt_valid=Xt_valid,
@@ -178,7 +178,7 @@ class OptimalTransportGridSearch:
                 yt_test=yt_test)
         else:
 
-            Xt_valid, Xt_test, yt_valid, yt_test, groupt_valid, groupt_test = mtb.cross_validation.tratest_split(
+            Xt_valid, Xt_test, yt_valid, yt_test, groupt_valid, groupt_test = mtb.cross_validation.train_test_split(
                 cv=cv_ai, X=self.Xt, y=self.yt, groups=self.group_t)
             self._share_args(
                 Xt_valid=Xt_valid,
@@ -305,7 +305,7 @@ class OptimalTransportGridSearch:
                                   group_t=None,
                                   cv_ai=StratifiedKFold(
                                       n_splits=2, shuffle=True, random_state=21),
-                                  classifier=RandomForestClassifier(),
+                                  classifier=RandomForestClassifier(random_state=42),
                                   parameters=dict(n_estimators=[100]),
                                   yt = None,
                                   ys=None):
