@@ -50,14 +50,14 @@ rot = pottok.RasterOptimalTransport(transport_function=ot.da.SinkhornTransport,
                                         params=dict(reg_e=[1e-1,1e-0]),verbose = False)
 
 
-rot.preprocessing(in_image_source=source_image,
-                      in_image_target=target_image,
-                      in_vector_source=labels,
-                      in_vector_target=labels,
-                      in_label_source=level3,
-                      in_label_target=level3,
-                      in_group_source=group_label,
-                      in_group_target=group_label,
+rot.preprocessing(image_source=source_image,
+                      image_target=target_image,
+                      vector_source=labels,
+                      vector_target=labels,
+                      label_source=level3,
+                      label_target=level3,
+                      group_source=group_label,
+                      group_target=group_label,
                       scaler=False)
 
 
@@ -84,31 +84,31 @@ print('\n\n')
 # -----------------------------------------------------
 
 
-# Xs, ys, group_s = mtb.processing.extract_ROI(source_image, labels, level2, group_label)
-# Xt, yt, group_t = mtb.processing.extract_ROI(target_image, labels, level2, group_label)
+Xs, ys, group_s = mtb.processing.extract_ROI(source_image, labels, level2, group_label)
+Xt, yt, group_t = mtb.processing.extract_ROI(target_image, labels, level2, group_label)
 
 
 
-# print('---------------------------------------------------------')
-# print("OTGS : régularisé entropie - Sinkhorn Transport")
+print('---------------------------------------------------------')
+print("OTGS : régularisé entropie - Sinkhorn Transport")
 
-# otgs = pottok.OptimalTransportGridSearch(transport_function=ot.da.SinkhornTransport,
-#                                         params=dict(reg_e=[1e-1,1e-0]),verbose = False)
+otgs = pottok.OptimalTransportGridSearch(transport_function=ot.da.SinkhornTransport,
+                                        params=dict(reg_e=[1e-1,1e-0]),verbose = False)
 
-# otgs.preprocessing(Xs,ys=ys,Xt=Xt,yt=yt,scaler=False)
+otgs.preprocessing(Xs,ys=ys,Xt=Xt,yt=yt,scaler=StandardScaler)
 
 
-# otgs.fit_crossed()
-# otgs_Xst = otgs.predict_transfer(Xs)
+otgs.fit_crossed()
+otgs_Xst = otgs.predict_transfer(Xs)
 
-# yt_no_trans_otgs, yt_transp_otgs = otgs.assess_transport(otgs_Xst)
+yt_no_trans_otgs, yt_transp_otgs = otgs.assess_transport(otgs_Xst)
 
-# yt_otgs = otgs.yt
-# print('---------------------------------------------------------')
-# print('yt predit SANS transport', '\n', 'Nombre de True : ', sum(yt_otgs == yt_no_trans_otgs),"/",len(yt_otgs))
-# print('---------------------------------------------------------')
-# print('yt predit AVEC transport', 'Nombre de True : ',sum(yt_otgs == yt_transp_otgs),"/",len(yt_otgs))
-# print('---------------------------------------------------------')
+yt_otgs = otgs.yt
+print('---------------------------------------------------------')
+print('yt predit SANS transport', '\n', 'Nombre de True : ', sum(yt_otgs == yt_no_trans_otgs),"/",len(yt_otgs))
+print('---------------------------------------------------------')
+print('yt predit AVEC transport', 'Nombre de True : ',sum(yt_otgs == yt_transp_otgs),"/",len(yt_otgs))
+print('---------------------------------------------------------')
 
 
 

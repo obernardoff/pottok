@@ -32,6 +32,8 @@ Pottok documentation
     :Generated: |today|
     :License: GPL v3
     :Version: |release|
+
+.. mdinclude:: ../../README.md
     
 .. include:: README.rst
     :start-line: 0
