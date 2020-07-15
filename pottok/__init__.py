@@ -135,7 +135,11 @@ class OptimalTransportGridSearch:
                     cv_ot=StratifiedKFold(n_splits=2, shuffle=True, random_state=42),
                     classifier=RandomForestClassifier(random_state=42),
                     parameters=dict(n_estimators=[100]),
-                    yt_use=True):
+                    yt_use=True,
+                    Xt_valid=None,
+                    Xt_test=None,
+                    yt_valid=None,
+                    yt_test=None):
         """
         Learn domain adaptation model with crossed tuning (fitting).
 
@@ -166,27 +170,37 @@ class OptimalTransportGridSearch:
             classifier=classifier,
             parameters=parameters,
             yt_use=yt_use)
-
-        if self.group_s is None:
-
-            Xt_valid, Xt_test, yt_valid, yt_test = mtb.cross_validation.train_test_split(
-                cv=cv_ot, X=self.Xt, y=self.yt)
+        
+        
+        if Xt_valid is not None : 
             self._share_args(
-                Xt_valid=Xt_valid,
-                Xt_test=Xt_test,
-                yt_valid=yt_valid,
-                yt_test=yt_test)
-        else:
+            Xt_valid=Xt_valid,
+            Xt_test=Xt_test,
+            yt_valid=yt_valid,
+            yt_test=yt_test)
+            
+        else : 
 
-            Xt_valid, Xt_test, yt_valid, yt_test, groupt_valid, groupt_test = mtb.cross_validation.train_test_split(
-                cv=cv_ai, X=self.Xt, y=self.yt, groups=self.group_t)
-            self._share_args(
-                Xt_valid=Xt_valid,
-                Xt_test=Xt_test,
-                yt_valid=yt_valid,
-                yt_test=yt_test,
-                groupt_valid=groupt_valid,
-                groupt_test=groupt_test)
+            if self.group_s is None:
+    
+                Xt_valid, Xt_test, yt_valid, yt_test = mtb.cross_validation.train_test_split(
+                    cv=cv_ot, X=self.Xt, y=self.yt)
+                self._share_args(
+                    Xt_valid=Xt_valid,
+                    Xt_test=Xt_test,
+                    yt_valid=yt_valid,
+                    yt_test=yt_test)
+            else:
+    
+                Xt_valid, Xt_test, yt_valid, yt_test, groupt_valid, groupt_test = mtb.cross_validation.train_test_split(
+                    cv=cv_ai, X=self.Xt, y=self.yt, groups=self.group_t)
+                self._share_args(
+                    Xt_valid=Xt_valid,
+                    Xt_test=Xt_test,
+                    yt_valid=yt_valid,
+                    yt_test=yt_test,
+                    groupt_valid=groupt_valid,
+                    groupt_test=groupt_test)
 
         # model with input parameters
         self._model = GridSearchCV(classifier, parameters, cv=cv_ai)
