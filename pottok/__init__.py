@@ -30,6 +30,7 @@ from itertools import product
 import ot
 import museotoolbox as mtb
 import gdal
+import pickle
 
 __version__ = "0.1-rc1"
 
@@ -269,7 +270,7 @@ class OptimalTransportGridSearch:
               "après transport")
 
 
-    def assess_transport(self, Xs_transform):
+    def assess_transport(self, Xs_transform, record = False, path = None):
         """
         OA comparison before and after OT
 
@@ -294,6 +295,9 @@ class OptimalTransportGridSearch:
         print("Avant transport, l'OA obtenu est de", round(oa_non_transport,3))
         # apres transport
         self._model.fit(Xs_transform, self.ys, self.group_s)
+        if record == True : 
+            pickle.dump(self._model, open(path, 'wb'))
+            print('Learning model has been record')
         y_pred_transport = self._model.predict(self.Xt)
         oa_transport = accuracy_score(self.yt, y_pred_transport)
         print(
