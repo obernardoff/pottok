@@ -576,6 +576,45 @@ class OptimalTransportGridSearch:
                   str(self.best_params))
             print('Best score is ' +
                   str(self.best_score))
+            
+            
+    def save_model(self, path):
+        """
+        Save model 'myModel.npz' to be loaded later via `SuperLearner.load_model(path)`
+
+        Parameters
+        ----------
+        path : str.
+            If path ends with npz, perfects, else will add '.npz' after your fileName.
+
+        Returns
+        -------
+        path : str.
+            Path and filename with mtb extension.
+        """
+        if not path.endswith('npz'):
+            path += '.npz'
+
+        np.savez_compressed(path, SL=self.__dict__)
+
+        return path
+
+
+    def load_model(self, path):
+        """
+        Load model previously saved with `SuperLearner.save_model(path)`.
+
+        Parameters
+        ----------
+        path : str.
+            If path ends with npy, perfects, else will add '.npy' after your fileName.
+        """
+        if not path.endswith('npz'):
+            path += '.npz'
+        model = np.load(path, allow_pickle=True)
+        self.__dict__.update(model['SL'].tolist())
+
+
 
 
 class RasterOptimalTransport(OptimalTransportGridSearch):
