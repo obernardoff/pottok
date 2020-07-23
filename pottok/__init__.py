@@ -260,6 +260,7 @@ class OptimalTransportGridSearch:
         y_pred_non_transport = self._model.predict(self.Xt_test)
         oa_non_transport = accuracy_score(
             self.yt_test, y_pred_non_transport)
+        print("Cross-validation (valid)")
         print("OA before transport :", round(oa_non_transport,3))
         # apres transport
         self._model.fit(Xs_transform, self.ys, self.group_s)
@@ -292,6 +293,7 @@ class OptimalTransportGridSearch:
         self._model.fit(self.Xs, self.ys, self.group_s)
         y_pred_non_transport = self._model.predict(self.Xt)
         oa_non_transport = accuracy_score(self.yt, y_pred_non_transport)
+        print("Cross-validation (valid)")
         print("OA before transport", round(oa_non_transport,3))
         # apres transport
         self._model.fit(Xs_transform, self.ys, self.group_s)
