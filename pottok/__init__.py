@@ -260,14 +260,14 @@ class OptimalTransportGridSearch:
         y_pred_non_transport = self._model.predict(self.Xt_test)
         oa_non_transport = accuracy_score(
             self.yt_test, y_pred_non_transport)
-        print("Avant transport, l'OA obtenu est de", round(oa_non_transport,3))
+        print("OA before transport :", round(oa_non_transport,3))
         # apres transport
         self._model.fit(Xs_transform, self.ys, self.group_s)
         y_pred_transport = self._model.predict(self.Xt_test)
         oa_transport = accuracy_score(self.yt_test, y_pred_transport)
-        print("Après transport, l'OA obtenu est de", round(oa_transport,3))
-        print("Il y a une amélioration de",round(oa_transport-oa_non_transport,4),
-              "après transport")
+        print("OA after transport", round(oa_transport,3))
+        print("There is a difference of",round(oa_transport-oa_non_transport,4),
+              "after transport")
 
 
     def assess_transport(self, Xs_transform, record = False, path = None):
@@ -292,7 +292,7 @@ class OptimalTransportGridSearch:
         self._model.fit(self.Xs, self.ys, self.group_s)
         y_pred_non_transport = self._model.predict(self.Xt)
         oa_non_transport = accuracy_score(self.yt, y_pred_non_transport)
-        print("Avant transport, l'OA obtenu est de", round(oa_non_transport,3))
+        print("OA before transport", round(oa_non_transport,3))
         # apres transport
         self._model.fit(Xs_transform, self.ys, self.group_s)
         if record == True : 
@@ -301,16 +301,16 @@ class OptimalTransportGridSearch:
         y_pred_transport = self._model.predict(self.Xt)
         oa_transport = accuracy_score(self.yt, y_pred_transport)
         print(
-            "Après transport, l'OA obtenu est de",
+            "OA after transport",
             round(oa_transport,3),
-            "sur toute l'image")
+            "on all image")
         print(
-            "Il y a une amélioration de",
+            "There is a difference of",
             round(
                 oa_transport -
                 oa_non_transport,
                 4),
-            "après transport (calcul sur toute l'image)")
+            "after transport (on all image)")
         
         return y_pred_non_transport, y_pred_transport
 
@@ -352,22 +352,22 @@ class OptimalTransportGridSearch:
         self._model.fit(self.Xs, self.ys, self.group_s)
         y_pred_non_transport = self._model.predict(self.Xt)
         oa_non_transport = accuracy_score(self.yt, y_pred_non_transport)
-        print("Avant transport, l'OA obtenu est de", round(oa_non_transport,3))
+        print("OA before transport", round(oa_non_transport,3))
         # apres transport
         self._model.fit(Xs_transform, self.ys, self.group_s)
         y_pred_transport = self._model.predict(self.Xt)
         oa_transport = accuracy_score(self.yt, y_pred_transport)
         print(
-            "Après transport, l'OA obtenu est de",
+            "OA after transport",
             round(oa_transport,3),
             "sur toute l'image")
         print(
-            "Il y a une amélioration de",
+            "There is a difference of",
             round(
                 oa_transport -
                 oa_non_transport,
                 4),
-            "après transport (calcul sur toute l'image)")
+            "after transport (on all image)")
         return y_pred_non_transport, y_pred_transport
 
 
@@ -500,14 +500,14 @@ class OptimalTransportGridSearch:
             # apprentissage du nouveau modele sur Xs_transform
             self._model.fit(Xs_transform, ys, group_val)
             if self.verbose == True :
-                print('Accord global issu de la validation croisée : ' +
+                print('Crossed validation OA : ' +
                       str(self._model.best_score_))
-                print('Le meilleur paramètre est : ' +
+                print('Best parameter : ' +
                       str(self._model.best_params_))
             # prediction sur les Xt_valid
             yt_pred_valid = self._model.predict(self.Xt_valid)
             oa_transport = accuracy_score(self.yt_valid, yt_pred_valid)
-            print("Après transport, l'OA obtenu est de", oa_transport)
+            print("OA after transport", oa_transport)
             print("-------------------------------------------------")
             # meilleurs parametres
             if self.best_score is None or oa_transport > self.best_score:
