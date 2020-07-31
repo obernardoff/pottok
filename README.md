@@ -14,5 +14,3 @@ Since a picture is worth more than a thousand words, we will use a concrete exam
 >Add tetris draw
 
 # Pottok installation
-
-
