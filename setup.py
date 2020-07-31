@@ -39,9 +39,6 @@ setuptools.setup(
     classifiers=[
         "Intended Audience :: Science/Research",
         "Programming Language :: Python :: 3",
-        "Topic :: Scientific/Engineering :: Optimal Transport",
-        "Topic :: Scientific/Engineering :: GIS",
-        "Topic :: Scientific/Engineering :: Remote Sensing"
     ],
     python_requires='>=3.5', #a confirmer 
     zip_safe=False,
