@@ -16,6 +16,7 @@ from sklearn.preprocessing import StandardScaler
 
 params = dict(reg_e=[10,1000,10000])
 divide_target_by = 2
+img_source, vector_source = mtb.datasets.load_historical_data(low_res=True)
 
 class TestOTGS(unittest.TestCase):
     def test_compare_otgs_rot(self):
@@ -29,7 +30,7 @@ class TestOTGS(unittest.TestCase):
         
         ###
         
-        img_source, vector_source = mtb.datasets.load_historical_data(low_res=True)
+        
         
         rot = pottok.RasterOptimalTransport(params=params,transport_function=ot.da.SinkhornTransport)
         rot.preprocessing(image_source = img_source, image_target = img_source, vector_source = vector_source, vector_target = vector_source, label_source = 'Class', label_target = 'Class',scaler=False)
