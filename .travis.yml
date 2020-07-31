@@ -24,13 +24,12 @@ install:
 
 script:
 - python setup.py develop
-- pytest -v  --cov=museotoolbox
+- pytest -v  --cov=pottok
 
 deploy:
   provider: pypi
-  user: OB???
-  password:
-    secure: ??
+  user: __token__
+  password: pypi-AgEIcHlwaS5vcmcCJDg1YzEzYzRkLTVmY2QtNDEwMC1iOGM4LWNlY2I0OTEzYmYyOQACJXsicGVybWlzc2lvbnMiOiAidXNlciIsICJ2ZXJzaW9uIjogMX0AAAYg2ZHjvB0CwZl1XIYdXlg57dOT51Ilq0WWN8O2NBCN6ak
   on:
     tags: true
     branch: master
