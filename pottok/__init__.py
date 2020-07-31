@@ -32,7 +32,7 @@ import museotoolbox as mtb
 import gdal
 import pickle
 
-__version__ = "0.1-rc2"
+__version__ = "0.1-rc3"
 
 
 class OptimalTransportGridSearch:
