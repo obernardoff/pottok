@@ -20,20 +20,6 @@ __version__ = re.search(
     r'__version__\s*=\s*[\'"]([^\'"]*)[\'"]',  # It excludes inline comment too
     open('pottok/__init__.py').read()).group(1)
 
-
-install_requires = []
-
-with open('./requirements.txt') as requirements_txt:
-    requirements = requirements_txt.read().strip().splitlines()
-    for requirement in requirements:
-        if requirement.startswith('#'):
-            continue
-        elif requirement.startswith('-e '):
-            install_requires.append(requirement.split('=')[1])
-        else:
-            install_requires.append(requirement)
-
-
 import setuptools
 
 with open("README.md", "r") as fh:
@@ -47,7 +33,7 @@ setuptools.setup(
     description="Optimal Transport with raster image, including an optimal transport validation",
     long_description=long_description,
     long_description_content_type="text/markdown",
-    install_requires=install_requires,
+    install_requires=['psutil','numpy','matplotlib','scikit-learn','POT','museotoolbox','museopheno'],
     url="https://github.com/obernardoff/pottok/",
     packages=setuptools.find_packages(),
     classifiers=[
@@ -60,7 +46,7 @@ setuptools.setup(
     python_requires='>=3.5', #a confirmer 
     zip_safe=False,
     package_data={
-      'pottok': ['datasets/blackpottok.jpg','datasets/brownpottok.jpg','datasets/brownpottok.gpkg','datasets/brownpottok.gpkg']
+      'pottok': ['datasets/blackpottok.tif','datasets/blackpottok.jpg','datasets/brownpottok.jpg','datasets/brownpottok.tif','datasets/brownpottok.gpkg','datasets/blackpottok.gpkg']
    }
 )
 
