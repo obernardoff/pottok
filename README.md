@@ -1,3 +1,8 @@
+[![Documentation status](https://readthedocs.org/projects/pottok/badge/?version=latest)](https://pottok.readthedocs.io/en/latest/?badge=latest)
+[![PyPI version](https://badge.fury.io/py/pottok.svg)](https://badge.fury.io/py/pottok)
+[![Build status](https://api.travis-ci.com/obernardoff/pottok.svg?branch=master)](https://travis-ci.com/obernardoff/pottok)
+[![Downloads](https://pepy.tech/badge/pottok)](https://pepy.tech/project/pottok)
+
 # Pottok - Python Optimal Transport for Terrestrial Observation Knowledge
 
 Pottok is a python library based on POT Python Optimal Transport. It provides a grid search for POT with two different method : crossed and circular.
