@@ -208,13 +208,16 @@ class OptimalTransportGridSearch:
         
         
 
-        if self.params_ot is None:
+        if self.params_ot is None and self.transport_function == ot.da.SinkhornTransport or self.transport_function == ot.da.EMDTransport:
             self.transport_model = self.transport_function()
-            self.transport_model.fit(self.Xs, ys=self.ys, Xt=self.Xt, yt=self.yt)
+            self.transport_model.fit(self.Xs, Xt=self.Xt)
 
         elif self._is_grid_search():
             self._find_best_parameters_crossed(
                 self.Xs, ys=self.ys, Xt=self.Xt, yt=self.yt, group_val=self.group_s)
+        else :
+            self.transport_model = self.transport_function()
+            self.transport_model.fit(self.Xs, ys=self.ys, Xt=self.Xt, yt=self.yt)
         
         return self.transport_model
 
