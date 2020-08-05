@@ -12,7 +12,7 @@ Pottok is a python library based on POT Python Optimal Transport. It provides a 
 # Classes description
 
 The two avalable classes are :
- - pottok.OptimalTransportGridsearch : Create a gris dearch compatible with POT. The user can use the circular grid search based on the circular validation and crossed grid search based on crossed validation. This one can use scikit learn or museotoolbox GridSearchCV.
+ - pottok.OptimalTransportGridsearch : Create a grid search compatible with POT. The user can use the circular grid search based on the circular validation and crossed grid search based on crossed validation. This one can use scikit learn or museotoolbox GridSearchCV.
  - pottok.RasterOptimalTransport : this class is specifically for raster use. 
 
 # How it works ? 
