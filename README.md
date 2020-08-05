@@ -1,4 +1,4 @@
-![Pottok logo](https://github.com/obernardoff/pottok/blob/develop/metadata/logopottok.png)
+![Pottok logo](https://github.com/obernardoff/pottok/raw/master/metadata/logopottok.png)
 
 [![Documentation status](https://readthedocs.org/projects/pottok/badge/?version=latest)](https://pottok.readthedocs.io/en/latest/?badge=latest)
 [![PyPI version](https://badge.fury.io/py/pottok.svg)](https://badge.fury.io/py/pottok)
