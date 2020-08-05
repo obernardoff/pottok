@@ -33,10 +33,8 @@ Pottok documentation
     :License: GPL v3
     :Version: |release|
 
-.. mdinclude:: ../../README.md
-    
 .. include:: README.rst
-    :start-line: 0
+    :start-line: 7
 
 .. toctree::
    :maxdepth: 2

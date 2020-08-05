@@ -133,6 +133,7 @@ todo_include_todos = False
 #
 html_theme = 'sphinx_rtd_theme'
 html_static_path = ['_static']
+html_logo = '../../metadata/logopottok_256.png'
 # TODO : logo POTTOK 
 # html_logo = '../../metadata/museoToolBox_logo_128.png'
 
