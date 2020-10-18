@@ -29,6 +29,6 @@ However, if you prefer to install this library via pip, you need to install firs
 python3 -m pip install pottok --user
 ```
 
-## Who built Museo ToolBox ?
+## Who built Pottok ?
 
 I am Olivia Bernardoff, I made pottok during my master degree internship at Dynafor Lab. I worked on remote sensing tree species mapping from space throught dense satellite image time series. I tested optimal transport on these times series to overcome data's lack of information. A special thanks goes to [Nicolas Karasiak](http://www.karasiak.net) who initiated me to the beautiful world of the open-source.
